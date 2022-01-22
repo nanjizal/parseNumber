@@ -15,4 +15,4 @@ parseTest( ' 0.0.1 ' );
 }
 ```
 
-https://nanjizal.github.io/parseNumber/index.html
+https://nanjizal.github.io/parseNumber/bin/main.html
