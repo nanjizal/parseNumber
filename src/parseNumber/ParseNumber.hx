@@ -43,7 +43,6 @@ function parse( no: String ){
     var isNumber = true;
     var dotCount = 0;
     var hasX = false;
-    //str.next();
     str.next();
     while( str.hasNext() ){
         //trace( str.c );
