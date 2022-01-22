@@ -14,5 +14,8 @@ function main(){
 parseTest( ' 0.0.1 ' );
 }
 ```
+view haxe js test here.
 
 https://nanjizal.github.io/parseNumber/bin/main.html
+
+( Not tested beyond js yet. )
