@@ -1,0 +1,12 @@
+{
+    "name"         : "parseNumber",
+    "url"          : "https://github.com/nanjizal/parseNumber#parseNumber",
+    "license"      : "MIT",
+    "tags"         : ["cross"],
+    "description"  : "basic tool to check numbers are valid",
+    "version"      : "0.0.1-alpha",
+    "releasenote"  : "See https://github.com/nanjizal/parseNumber/blob/master/CHANGELOG.md",
+    "contributors" : ["Nanjizal"],
+    "classPath"    : "src",
+    "dependencies" : {}
+}
