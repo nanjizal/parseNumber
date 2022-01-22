@@ -14,3 +14,5 @@ function main(){
 parseTest( ' 0.0.1 ' );
 }
 ```
+
+https://nanjizal.github.io/parseNumber/
