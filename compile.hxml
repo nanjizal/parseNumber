@@ -1,5 +1,5 @@
 -cp src
--js Main.js
+-js main.js
 -lib htmlHelper
 
 -main parseNumber.Main
