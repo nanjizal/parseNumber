@@ -30,7 +30,7 @@ function main(){
     }
     
     trace( 'test Scientific' );
-    trace( '123e5 = ' + parse( '123e5', true ) );
-    trace( '123e-5 = ' + parse( '123e-5', true ) );
-    trace( '123e-5 e = ' + parse( '123e-5 e', true ) );
+    trace( '123e5 = ' + parse( '123e5', false, false, true ) );
+    trace( '123e-5 = ' + parse( '123e-5', false, false, true ) );
+    trace( '123e-5 e = ' + parse( '123e-5 e', false, false, true ) );
 }
