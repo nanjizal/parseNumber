@@ -46,7 +46,7 @@ function parseInt( no: String ){
      * 
      * <pre><code>
      * >>> ({ 
-     * ... trace( 'accpetance of hex number "0xFFFF00" = ' + parse('0xFFFF00'));
+     * ... trace( 'acceptance of hex number "0xFFFF00" = ' + parse('0xFFFF00'));
      * ... var no: String = parse('0xFFFF00');
      * ... no == '0xFFFF00'; }) == true
      * </code></pre>
