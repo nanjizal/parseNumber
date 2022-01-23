@@ -1,1 +1,0 @@
-typedef js.lib.Iterator<T> = { next : () -> js.lib.IteratorStep<js.lib.Iterator.T> }

@@ -1,1 +1,0 @@
-typedef utest.Accessories = { ?teardownClass : Null<() -> utest.Async>, ?teardown : Null<() -> utest.Async>, ?setupClass : Null<() -> utest.Async>, ?setup : Null<() -> utest.Async> }
