@@ -1985,7 +1985,7 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 		}
 		var left;
 		try {
-			haxe_Log.trace("accpetance of hex number \"0xFFFF00\" = " + parseNumber_ParseNumber_parse("0xFFFF00"),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
+			haxe_Log.trace("acceptance of hex number \"0xFFFF00\" = " + parseNumber_ParseNumber_parse("0xFFFF00"),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
 			var no = parseNumber_ParseNumber_parse("0xFFFF00");
 			left = no == "0xFFFF00";
 		} catch( _g ) {
@@ -2002,9 +2002,9 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 			right = "exception: " + Std.string(ex) + hx_doctest_internal_DocTestUtils.exceptionStackAsString();
 		}
 		if(hx_doctest_internal_DocTestUtils.deepEquals(left,right)) {
-			utest_Assert.pass("src/parseNumber/ParseNumber.hx:48 [OK] ({\ntrace( 'accpetance of hex number \"0xFFFF00\" = ' + parse('0xFFFF00'));\nvar no: String = parse('0xFFFF00');\nno == '0xFFFF00'; }) == true",{ lineNumber : 48, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.pass("src/parseNumber/ParseNumber.hx:48 [OK] ({\ntrace( 'acceptance of hex number \"0xFFFF00\" = ' + parse('0xFFFF00'));\nvar no: String = parse('0xFFFF00');\nno == '0xFFFF00'; }) == true",{ lineNumber : 48, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		} else {
-			utest_Assert.fail("({\ntrace( 'accpetance of hex number \"0xFFFF00\" = ' + parse('0xFFFF00'));\nvar no: String = parse('0xFFFF00');\nno == '0xFFFF00'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 48, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.fail("({\ntrace( 'acceptance of hex number \"0xFFFF00\" = ' + parse('0xFFFF00'));\nvar no: String = parse('0xFFFF00');\nno == '0xFFFF00'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 48, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		}
 		var left;
 		try {

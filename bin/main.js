@@ -174,9 +174,9 @@ function parseNumber_MainParseNumber_main() {
 		parseNumber_ParseNumber_parseTest(value,true,true,true);
 	}
 	haxe_Log.trace("test Scientific",{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 32, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
-	haxe_Log.trace("123e5 = " + parseNumber_ParseNumber_parse("123e5",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 33, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
-	haxe_Log.trace("123e-5 = " + parseNumber_ParseNumber_parse("123e-5",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 34, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
-	haxe_Log.trace("123e-5 e = " + parseNumber_ParseNumber_parse("123e-5 e",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 35, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
+	haxe_Log.trace("123e5 = " + parseNumber_ParseNumber_parse("123e5",false,false,true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 33, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
+	haxe_Log.trace("123e-5 = " + parseNumber_ParseNumber_parse("123e-5",false,false,true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 34, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
+	haxe_Log.trace("123e-5 e = " + parseNumber_ParseNumber_parse("123e-5 e",false,false,true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 35, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
 }
 function parseNumber_ParseNumber_parseTest(no,allowComma,allowUnderscore,allowScientific) {
 	if(allowScientific == null) {

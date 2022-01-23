@@ -1,0 +1,612 @@
+@:nullSafety
+class hx.doctest.DocTestGenerator {
+
+	@:value({ }) @:keep
+	static var __static_init(default,never):{ } = {};
+
+	@:value(Context.defined("lua") ? 30 : 100)
+	static var MAX_ASSERTIONS_PER_TEST_METHOD(default,never):Int = if (haxe.macro.Context.defined("lua")) {
+		30;
+	} else {
+		100;
+	};
+
+	@:has_untyped
+	public static function generateDocTests(config:Null<hx.doctest.DocTestGeneratorConfig> = null) {
+		var config = [config];
+		if (config[0] == null) {
+			config[0] = {};
+		};
+		if (config[0].srcFolder == null) {
+			config[0].srcFolder = "src";
+		};
+		if (config[0].srcFilePathPattern == null) {
+			config[0].srcFilePathPattern = ".+\\.hx$";
+		};
+		if (config[0].docTestLineIdentifier == null) {
+			config[0].docTestLineIdentifier = "* >>>";
+		};
+		if (config[0].docTestNextLineIdentifier == null) {
+			config[0].docTestNextLineIdentifier = "* ...";
+		};
+		var doctestAdapter = hx.doctest.DocTestGenerator.getDocTestAdapter();
+		var contextFields = haxe.macro.Context.getBuildFields();
+		haxe.macro.Context.getLocalClass().get().meta.add(":keep", [], haxe.macro.Context.currentPos());
+		var totalAssertionsCount = [0];
+		var parser = new hscript.Parser();
+		hx.doctest.internal.Logger.log(hx.doctest.internal.Level.INFO, "Activated via @:build on [" + haxe.macro.Context.getLocalClass().get().module + "]", {fileName : "/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", lineNumber : 103, className : "hx.doctest.DocTestGenerator", methodName : "generateDocTests"});
+		hx.doctest.internal.Logger.log(hx.doctest.internal.Level.INFO, "Generating test cases for test framework [" + doctestAdapter.getFrameworkName() + "]...", {fileName : "/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", lineNumber : 104, className : "hx.doctest.DocTestGenerator", methodName : "generateDocTests"});
+		hx.doctest.internal.DocTestUtils.walkDirectory(config[0].srcFolder, new EReg(config[0].srcFilePathPattern, ""), function(srcFilePath:String) {
+			var compilerConditions = new Array();
+			var src = new hx.doctest.internal.SourceFile(srcFilePath, config[0].docTestLineIdentifier, config[0].docTestNextLineIdentifier);
+			var testMethodAssertions = new Array();
+			var testMethodsCount = 0;
+			while (src.nextLine()) {
+				@:ast(switch (src.currentLine) {
+	case DocTestAssertion(assertion):
+		if (compilerConditions.indexOf(false) > -1) continue;
+		var doctestLineFQ = new EReg("(^|[\\s(=<>!:])" + src.haxeModuleName + "(\\s?[(.<=])", "g").replace(assertion.expression, "$1" + src.haxeModuleFQName + "$2");
+		totalAssertionsCount++;
+		if (assertion.expression.indexOf(" === ") > -1) {
+			var left = doctestLineFQ.substringBeforeLast(" === ").trim();
+			var right = doctestLineFQ.substringAfterLast(" === ").trim();
+			var leftExpr:Expr = try {
+				Context.parse(left, Context.currentPos());
+			} catch(ex:Dynamic) {
+				testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse left side: $ex"));
+				continue;
+			};
+			var rightExpr:Expr = try {
+				Context.parse(right, Context.currentPos());
+			} catch(ex:Dynamic) {
+				testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse right side: $ex"));
+				continue;
+			};
+			var testSuccessExpr = doctestAdapter.generateTestSuccess(assertion);
+			var testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` not same instance as `$right`.");
+			testMethodAssertions.push(({ expr : EBlock([{ expr : EVars([{ name : "left", type : null, expr : leftExpr, isFinal : true, meta : [] }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5487, 5510) }, { expr : EVars([{ name : "right", type : null, expr : rightExpr, isFinal : true, meta : [] }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5535, 5560) }, { expr : EIf({ expr : EBinop(OpEq, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5589, 5593) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5597, 5602) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5589, 5602) }, testSuccessExpr, testFailedExpr), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5585, 5720) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5461, 5744) } : haxe.macro.Expr));
+		} else if (assertion.expression.indexOf(" !== ") > -1) {
+			var left = doctestLineFQ.substringBeforeLast(" !== ").trim();
+			var right = doctestLineFQ.substringAfterLast(" !== ").trim();
+			var leftExpr:Expr = try {
+				Context.parse(left, Context.currentPos());
+			} catch(ex:Dynamic) {
+				testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse left side: $ex"));
+				continue;
+			};
+			var rightExpr:Expr = try {
+				Context.parse(right, Context.currentPos());
+			} catch(ex:Dynamic) {
+				testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse right side: $ex"));
+				continue;
+			};
+			var testSuccessExpr = doctestAdapter.generateTestSuccess(assertion);
+			var testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is same instance right side.");
+			testMethodAssertions.push(({ expr : EBlock([{ expr : EVars([{ name : "left", type : null, expr : leftExpr, isFinal : true, meta : [] }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7065, 7088) }, { expr : EVars([{ name : "right", type : null, expr : rightExpr, isFinal : true, meta : [] }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7113, 7138) }, { expr : EIf({ expr : EBinop(OpNotEq, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7167, 7171) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7175, 7180) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7167, 7180) }, testSuccessExpr, testFailedExpr), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7163, 7298) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7039, 7322) } : haxe.macro.Expr));
+		} else if (assertion.expression.indexOf(" throws ") > -1) {
+			var left = doctestLineFQ.substringBeforeLast(" throws ").trim();
+			var right = doctestLineFQ.substringAfterLast(" throws ").trim();
+			var leftExpr:Expr = try {
+				Context.parse(left, Context.currentPos());
+			} catch(ex:Dynamic) {
+				testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse left side: $ex"));
+				continue;
+			};
+			var rightExpr:Expr = right == "nothing" ? ({ expr : EConst(CString("nothing", DoubleQuotes)), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8065, 8074) } : haxe.macro.Expr) : try {
+				Context.parse(right, Context.currentPos());
+			} catch(ex:Dynamic) {
+				testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse right side: $ex"));
+				continue;
+			};
+			var testSuccessExpr = doctestAdapter.generateTestSuccess(assertion);
+			var testFailedExpr = doctestAdapter.generateTestFail(assertion, "Expected `$right` but was `$left`.");
+			testMethodAssertions.push(({ expr : EBlock([{ expr : EVars([{ name : "left", type : TPath({ pack : [], name : "Dynamic", params : [] }), expr : { expr : EConst(CString("nothing", DoubleQuotes)), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8699, 8708) }, isFinal : false, meta : [] }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8680, 8709) }, { expr : ETry({ expr : EBlock([leftExpr]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8738, 8752) }, [{ name : "ex", type : TPath({ pack : [], name : "Dynamic", params : [] }), expr : { expr : EBinop(OpAssign, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8772, 8776) }, { expr : EConst(CIdent("ex")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8779, 8781) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8772, 8781) } }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8734, 8781) }, { expr : EVars([{ name : "right", type : TPath({ pack : [], name : "Dynamic", params : [] }), expr : null, isFinal : false, meta : [] }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8807, 8825) }, { expr : ETry({ expr : EBlock([{ expr : EBinop(OpAssign, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8856, 8861) }, rightExpr), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8856, 8874) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8854, 8877) }, [{ name : "ex", type : TPath({ pack : [], name : "Dynamic", params : [] }), expr : { expr : EBinop(OpAssign, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8897, 8902) }, { expr : EBinop(OpAdd, { expr : EConst(CString("exception: ", DoubleQuotes)), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8905, 8918) }, { expr : EConst(CIdent("ex")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8921, 8923) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8905, 8923) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8897, 8923) } }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8850, 8923) }, { expr : EIf({ expr : ECall({ expr : EField({ expr : EField({ expr : EField({ expr : EField({ expr : EConst(CIdent("hx")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8956) }, "doctest"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8964) }, "internal"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8973) }, "DocTestUtils"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8986) }, "deepEquals"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8997) }, [{ expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8998, 9002) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 9004, 9009) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 9010) }, testSuccessExpr, testFailedExpr), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8950, 9128) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8654, 9152) } : haxe.macro.Expr));
+		} else {
+			var doctestExpr = try {
+				Context.parse(doctestLineFQ, Context.currentPos());
+			} catch(ex:Dynamic) {
+				testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse assertion: $ex"));
+				continue;
+			};
+			var leftExpr:Expr;
+			var rightExpr:Expr;
+			var comparator:Binop;
+			switch (doctestExpr.expr) {
+				case EBinop(op, l, r):
+					switch (op) {
+						case OpEq, OpNotEq, OpLte, OpLt, OpGt, OpGte:
+							comparator = op;						
+						default:
+							testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Assertion is missing one of the valid comparison operators: == != <= < > =>"));
+							continue;						
+					};
+					leftExpr = l;
+					rightExpr = r;				
+				default:
+					testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Assertion is missing one of the valid comparison operators: == != <= < > =>"));
+					continue;				
+			};
+			var comparisonExpr:Expr;
+			var testSuccessExpr = doctestAdapter.generateTestSuccess(assertion);
+			var testFailedExpr:Expr;
+			switch (comparator) {
+				case OpEq:
+					comparisonExpr = ({ expr : ECall({ expr : EField({ expr : EField({ expr : EField({ expr : EField({ expr : EConst(CIdent("hx")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11064) }, "doctest"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11072) }, "internal"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11081) }, "DocTestUtils"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11094) }, "deepEquals"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11105) }, [{ expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11106, 11110) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11112, 11117) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11118) } : haxe.macro.Expr);
+					testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` does not equal `$right`.");				
+				case OpNotEq:
+					comparisonExpr = ({ expr : EUnop(OpNot, false, { expr : ECall({ expr : EField({ expr : EField({ expr : EField({ expr : EField({ expr : EConst(CIdent("hx")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11345) }, "doctest"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11353) }, "internal"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11362) }, "DocTestUtils"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11375) }, "deepEquals"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11386) }, [{ expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11387, 11391) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11393, 11398) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11399) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11342, 11399) } : haxe.macro.Expr);
+					testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` equals `$right`.");				
+				case OpLte:
+					comparisonExpr = ({ expr : EBinop(OpLte, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11613, 11617) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11621, 11626) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11613, 11626) } : haxe.macro.Expr);
+					testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not lower than or equal `$right`.");				
+				case OpLt:
+					comparisonExpr = ({ expr : EBinop(OpLt, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11859, 11863) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11866, 11871) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11859, 11871) } : haxe.macro.Expr);
+					testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not lower than `$right`.");				
+				case OpGt:
+					comparisonExpr = ({ expr : EBinop(OpGt, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12095, 12099) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12102, 12107) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12095, 12107) } : haxe.macro.Expr);
+					testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not greater than `$right`.");				
+				case OpGte:
+					comparisonExpr = ({ expr : EBinop(OpGte, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12334, 12338) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12342, 12347) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12334, 12347) } : haxe.macro.Expr);
+					testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not greater than or equal `$right`.");				
+				default:
+					throw "Should never be reached";				
+			};
+			testMethodAssertions.push(({ expr : EBlock([{ expr : EVars([{ name : "left", type : TPath({ pack : [], name : "Dynamic", params : [] }), expr : null, isFinal : false, meta : [] }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12666, 12683) }, { expr : ETry({ expr : EBlock([{ expr : EBinop(OpAssign, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12714, 12718) }, leftExpr), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12714, 12730) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12712, 12733) }, [{ name : "ex", type : TPath({ pack : [], name : "Dynamic", params : [] }), expr : { expr : EBinop(OpAssign, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12753, 12757) }, { expr : EBinop(OpAdd, { expr : EBinop(OpAdd, { expr : EConst(CString("exception: ", DoubleQuotes)), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12760, 12773) }, { expr : EConst(CIdent("ex")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12776, 12778) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12760, 12778) }, { expr : ECall({ expr : EField({ expr : EField({ expr : EField({ expr : EField({ expr : EConst(CIdent("hx")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12783) }, "doctest"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12791) }, "internal"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12800) }, "DocTestUtils"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12813) }, "exceptionStackAsString"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12836) }, []), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12838) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12760, 12838) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12753, 12838) } }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12708, 12838) }, { expr : EVars([{ name : "right", type : TPath({ pack : [], name : "Dynamic", params : [] }), expr : null, isFinal : false, meta : [] }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12864, 12882) }, { expr : ETry({ expr : EBlock([{ expr : EBinop(OpAssign, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12913, 12918) }, rightExpr), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12913, 12931) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12911, 12934) }, [{ name : "ex", type : TPath({ pack : [], name : "Dynamic", params : [] }), expr : { expr : EBinop(OpAssign, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12954, 12959) }, { expr : EBinop(OpAdd, { expr : EBinop(OpAdd, { expr : EConst(CString("exception: ", DoubleQuotes)), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12962, 12975) }, { expr : EConst(CIdent("ex")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12978, 12980) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12962, 12980) }, { expr : ECall({ expr : EField({ expr : EField({ expr : EField({ expr : EField({ expr : EConst(CIdent("hx")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 12985) }, "doctest"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 12993) }, "internal"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 13002) }, "DocTestUtils"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 13015) }, "exceptionStackAsString"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 13038) }, []), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 13040) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12962, 13040) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12954, 13040) } }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12907, 13040) }, { expr : EIf(comparisonExpr, { expr : EBlock([testSuccessExpr]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 13088, 13160) }, { expr : EBlock([testFailedExpr]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 13166, 13237) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 13067, 13237) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12640, 13260) } : haxe.macro.Expr));
+		};
+		if (testMethodAssertions.length == 0) continue;
+		if (testMethodAssertions.length == MAX_ASSERTIONS_PER_TEST_METHOD || Std.is(doctestAdapter, HaxeUnitDocTestAdapter) || Std.is(doctestAdapter, MUnitDocTestAdapter)) {
+			testMethodsCount++;
+			var testMethodName = "test${src.haxeModuleName}_$testMethodsCount";
+			Logger.log(DEBUG, "|--> Generating function \"${testMethodName}()\"...");
+			contextFields.push(doctestAdapter.generateTestMethod(testMethodName, "Doc Testing [${src.filePath}] #${testMethodsCount}", testMethodAssertions));
+			testMethodAssertions = new Array<Expr>();
+		};	
+	case CompilerConditionStart(condition):
+		if (condition.indexOf("#end") > -1) continue;
+		var interp = new hscript.Interp();
+		var reg = new EReg("[a-zA-Z]\\w*", "gi");
+		var defines = haxe.macro.Context.getDefines();
+		var pos = 0;
+		while (reg.matchSub(condition, pos)) {
+			var pos2 = reg.matchedPos();
+			var define = reg.matched(0);
+			var defineValue = defines.get(define);
+			interp.variables.set(define, defineValue == null ? false : defineValue == "1" ? true : defineValue);
+			pos = reg.matchedPos().pos + reg.matchedPos().len;
+		};
+		try {
+			var result:Bool = interp.execute(parser.parseString(condition));
+			compilerConditions.push(result);
+		} catch(ex:Dynamic) {
+			Logger.log(ERROR, "Failed to parse compiler condition \"#if $condition\" -> $ex");
+		};
+		continue;	
+	case CompilerConditionElseIf(condition):
+		var interp = new hscript.Interp();
+		var reg = new EReg("[a-zA-Z]\\w*", "gi");
+		var defines = haxe.macro.Context.getDefines();
+		var pos = 0;
+		while (reg.matchSub(condition, pos)) {
+			var pos2 = reg.matchedPos();
+			var define = reg.matched(0);
+			var defineValue = defines.get(define);
+			interp.variables.set(define, defineValue == null ? false : defineValue);
+			pos = reg.matchedPos().pos + reg.matchedPos().len;
+		};
+		try {
+			var result:Bool = interp.execute(parser.parseString(condition));
+			if (compilerConditions.length > 0) compilerConditions.pop();
+			compilerConditions.push(result);
+		} catch(ex:Dynamic) {
+			Logger.log(ERROR, "Failed to parse compiler condition \"#elseif $condition\" -> $ex");
+		};
+		continue;	
+	case CompilerConditionElse:
+		if (compilerConditions.length > 0) {
+			compilerConditions.push(!compilerConditions.pop());
+		};
+		continue;	
+	case CompilerConditionEnd:
+		if (compilerConditions.length > 0) compilerConditions.pop();
+		continue;	
+}) {
+					var ` = src.currentLine;
+					switch (@:exhaustive enumIndex `) {
+						case 0: {
+							var `1 = `[0];
+							{
+								var assertion = `1;
+								{
+									if (compilerConditions.indexOf(false, null) > -1) {
+										continue;
+									};
+									var doctestLineFQ = new EReg("(^|[\\s(=<>!:])" + src.haxeModuleName + "(\\s?[(.<=])", "g").replace(assertion.expression, "$1" + src.haxeModuleFQName + "$2");
+									totalAssertionsCount[0] ++;
+									if (assertion.expression.indexOf(" === ", null) > -1) {
+										var left = StringTools.trim(hx.doctest.internal.DocTestUtils.substringBeforeLast(doctestLineFQ, " === "));
+										var right = StringTools.trim(hx.doctest.internal.DocTestUtils.substringAfterLast(doctestLineFQ, " === "));
+										var leftExpr = try {
+											haxe.macro.Context.parse(left, haxe.macro.Context.currentPos());
+										} catch (`:Dynamic) {
+											var ` = haxe.Exception.caught(`);
+											var ` = `.unwrap();
+											if (true) {
+												var ex = `;
+												{
+													testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse left side: " + Std.string(ex)));
+													continue;
+												};
+											} else throw `;
+										};
+										var rightExpr = try {
+											haxe.macro.Context.parse(right, haxe.macro.Context.currentPos());
+										} catch (`:Dynamic) {
+											var ` = haxe.Exception.caught(`);
+											var ` = `.unwrap();
+											if (true) {
+												var ex = `;
+												{
+													testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse right side: " + Std.string(ex)));
+													continue;
+												};
+											} else throw `;
+										};
+										var testSuccessExpr = doctestAdapter.generateTestSuccess(assertion);
+										var testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` not same instance as `$right`.");
+										testMethodAssertions.push(cast {expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.EVars([{name : "left", type : null, expr : leftExpr, isFinal : cast true, meta : []}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5487, 5510)}, {expr : haxe.macro.ExprDef.EVars([{name : "right", type : null, expr : rightExpr, isFinal : cast true, meta : []}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5535, 5560)}, {expr : haxe.macro.ExprDef.EIf({expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpEq, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5589, 5593)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5597, 5602)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5589, 5602)}, testSuccessExpr, testFailedExpr), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5585, 5720)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 5461, 5744)});
+									} else {
+										if (assertion.expression.indexOf(" !== ", null) > -1) {
+											var left = StringTools.trim(hx.doctest.internal.DocTestUtils.substringBeforeLast(doctestLineFQ, " !== "));
+											var right = StringTools.trim(hx.doctest.internal.DocTestUtils.substringAfterLast(doctestLineFQ, " !== "));
+											var leftExpr = try {
+												haxe.macro.Context.parse(left, haxe.macro.Context.currentPos());
+											} catch (`:Dynamic) {
+												var ` = haxe.Exception.caught(`);
+												var ` = `.unwrap();
+												if (true) {
+													var ex = `;
+													{
+														testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse left side: " + Std.string(ex)));
+														continue;
+													};
+												} else throw `;
+											};
+											var rightExpr = try {
+												haxe.macro.Context.parse(right, haxe.macro.Context.currentPos());
+											} catch (`:Dynamic) {
+												var ` = haxe.Exception.caught(`);
+												var ` = `.unwrap();
+												if (true) {
+													var ex = `;
+													{
+														testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse right side: " + Std.string(ex)));
+														continue;
+													};
+												} else throw `;
+											};
+											var testSuccessExpr = doctestAdapter.generateTestSuccess(assertion);
+											var testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is same instance right side.");
+											testMethodAssertions.push(cast {expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.EVars([{name : "left", type : null, expr : leftExpr, isFinal : cast true, meta : []}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7065, 7088)}, {expr : haxe.macro.ExprDef.EVars([{name : "right", type : null, expr : rightExpr, isFinal : cast true, meta : []}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7113, 7138)}, {expr : haxe.macro.ExprDef.EIf({expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpNotEq, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7167, 7171)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7175, 7180)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7167, 7180)}, testSuccessExpr, testFailedExpr), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7163, 7298)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 7039, 7322)});
+										} else {
+											if (assertion.expression.indexOf(" throws ", null) > -1) {
+												var left = StringTools.trim(hx.doctest.internal.DocTestUtils.substringBeforeLast(doctestLineFQ, " throws "));
+												var right = StringTools.trim(hx.doctest.internal.DocTestUtils.substringAfterLast(doctestLineFQ, " throws "));
+												var leftExpr = try {
+													haxe.macro.Context.parse(left, haxe.macro.Context.currentPos());
+												} catch (`:Dynamic) {
+													var ` = haxe.Exception.caught(`);
+													var ` = `.unwrap();
+													if (true) {
+														var ex = `;
+														{
+															testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse left side: " + Std.string(ex)));
+															continue;
+														};
+													} else throw `;
+												};
+												var rightExpr = if (right == "nothing") {
+													cast {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CString("nothing", haxe.macro.StringLiteralKind.DoubleQuotes)), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8065, 8074)};
+												} else {
+													try {
+														haxe.macro.Context.parse(right, haxe.macro.Context.currentPos());
+													} catch (`:Dynamic) {
+														var ` = haxe.Exception.caught(`);
+														var ` = `.unwrap();
+														if (true) {
+															var ex = `;
+															{
+																testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse right side: " + Std.string(ex)));
+																continue;
+															};
+														} else throw `;
+													};
+												};
+												var testSuccessExpr = doctestAdapter.generateTestSuccess(assertion);
+												var testFailedExpr = doctestAdapter.generateTestFail(assertion, "Expected `$right` but was `$left`.");
+												testMethodAssertions.push(cast {expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.EVars([{name : "left", type : haxe.macro.ComplexType.TPath({pack : [], name : "Dynamic", params : []}), expr : {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CString("nothing", haxe.macro.StringLiteralKind.DoubleQuotes)), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8699, 8708)}, isFinal : cast false, meta : []}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8680, 8709)}, {expr : haxe.macro.ExprDef.ETry({expr : haxe.macro.ExprDef.EBlock([leftExpr]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8738, 8752)}, [{name : "ex", type : haxe.macro.ComplexType.TPath({pack : [], name : "Dynamic", params : []}), expr : {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAssign, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8772, 8776)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("ex")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8779, 8781)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8772, 8781)}}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8734, 8781)}, {expr : haxe.macro.ExprDef.EVars([{name : "right", type : haxe.macro.ComplexType.TPath({pack : [], name : "Dynamic", params : []}), expr : null, isFinal : cast false, meta : []}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8807, 8825)}, {expr : haxe.macro.ExprDef.ETry({expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAssign, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8856, 8861)}, rightExpr), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8856, 8874)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8854, 8877)}, [{name : "ex", type : haxe.macro.ComplexType.TPath({pack : [], name : "Dynamic", params : []}), expr : {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAssign, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8897, 8902)}, {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAdd, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CString("exception: ", haxe.macro.StringLiteralKind.DoubleQuotes)), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8905, 8918)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("ex")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8921, 8923)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8905, 8923)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8897, 8923)}}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8850, 8923)}, {expr : haxe.macro.ExprDef.EIf({expr : haxe.macro.ExprDef.ECall({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("hx")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8956)}, "doctest"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8964)}, "internal"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8973)}, "DocTestUtils"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8986)}, "deepEquals"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 8997)}, [{expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8998, 9002)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 9004, 9009)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8954, 9010)}, testSuccessExpr, testFailedExpr), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8950, 9128)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 8654, 9152)});
+											} else {
+												var doctestExpr = try {
+													haxe.macro.Context.parse(doctestLineFQ, haxe.macro.Context.currentPos());
+												} catch (`:Dynamic) {
+													var ` = haxe.Exception.caught(`);
+													var ` = `.unwrap();
+													if (true) {
+														var ex = `;
+														{
+															testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Failed to parse assertion: " + Std.string(ex)));
+															continue;
+														};
+													} else throw `;
+												};
+												var leftExpr;
+												var rightExpr;
+												var comparator;
+												@:ast(switch (doctestExpr.expr) {
+	case EBinop(op, l, r):
+		switch (op) {
+			case OpEq, OpNotEq, OpLte, OpLt, OpGt, OpGte:
+				comparator = op;			
+			default:
+				testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Assertion is missing one of the valid comparison operators: == != <= < > =>"));
+				continue;			
+		};
+		leftExpr = l;
+		rightExpr = r;	
+	default:
+		testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Assertion is missing one of the valid comparison operators: == != <= < > =>"));
+		continue;	
+}) {
+													var ` = doctestExpr.expr;
+													if (enumIndex ` == 2) {
+														var `1 = `[0];
+														var `2 = `[1];
+														var `3 = `[2];
+														{
+															var op = `1;
+															var l = `2;
+															var r = `3;
+															{
+																@:ast(switch (op) {
+	case OpEq, OpNotEq, OpLte, OpLt, OpGt, OpGte:
+		comparator = op;	
+	default:
+		testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Assertion is missing one of the valid comparison operators: == != <= < > =>"));
+		continue;	
+}) switch (enumIndex op) {
+																	case 5, 6, 7, 8, 9, 10: {
+																		{
+																			comparator = op;
+																		};
+																	};
+																	default: {
+																		testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Assertion is missing one of the valid comparison operators: == != <= < > =>"));
+																		continue;
+																	}
+																};
+																leftExpr = l;
+																rightExpr = r;
+															};
+														};
+													} else {
+														testMethodAssertions.push(doctestAdapter.generateTestFail(assertion, "Assertion is missing one of the valid comparison operators: == != <= < > =>"));
+														continue;
+													};
+												};
+												var comparisonExpr;
+												var testSuccessExpr = doctestAdapter.generateTestSuccess(assertion);
+												var testFailedExpr;
+												@:ast(switch (comparator) {
+	case OpEq:
+		comparisonExpr = ({ expr : ECall({ expr : EField({ expr : EField({ expr : EField({ expr : EField({ expr : EConst(CIdent("hx")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11064) }, "doctest"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11072) }, "internal"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11081) }, "DocTestUtils"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11094) }, "deepEquals"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11105) }, [{ expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11106, 11110) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11112, 11117) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11118) } : haxe.macro.Expr);
+		testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` does not equal `$right`.");	
+	case OpNotEq:
+		comparisonExpr = ({ expr : EUnop(OpNot, false, { expr : ECall({ expr : EField({ expr : EField({ expr : EField({ expr : EField({ expr : EConst(CIdent("hx")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11345) }, "doctest"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11353) }, "internal"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11362) }, "DocTestUtils"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11375) }, "deepEquals"), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11386) }, [{ expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11387, 11391) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11393, 11398) }]), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11399) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11342, 11399) } : haxe.macro.Expr);
+		testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` equals `$right`.");	
+	case OpLte:
+		comparisonExpr = ({ expr : EBinop(OpLte, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11613, 11617) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11621, 11626) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11613, 11626) } : haxe.macro.Expr);
+		testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not lower than or equal `$right`.");	
+	case OpLt:
+		comparisonExpr = ({ expr : EBinop(OpLt, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11859, 11863) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11866, 11871) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11859, 11871) } : haxe.macro.Expr);
+		testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not lower than `$right`.");	
+	case OpGt:
+		comparisonExpr = ({ expr : EBinop(OpGt, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12095, 12099) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12102, 12107) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12095, 12107) } : haxe.macro.Expr);
+		testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not greater than `$right`.");	
+	case OpGte:
+		comparisonExpr = ({ expr : EBinop(OpGte, { expr : EConst(CIdent("left")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12334, 12338) }, { expr : EConst(CIdent("right")), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12342, 12347) }), pos : untyped $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12334, 12347) } : haxe.macro.Expr);
+		testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not greater than or equal `$right`.");	
+	default:
+		throw "Should never be reached";	
+}) switch (enumIndex comparator) {
+													case 5: {
+														{
+															comparisonExpr = cast {expr : haxe.macro.ExprDef.ECall({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("hx")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11064)}, "doctest"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11072)}, "internal"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11081)}, "DocTestUtils"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11094)}, "deepEquals"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11105)}, [{expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11106, 11110)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11112, 11117)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11062, 11118)};
+															testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` does not equal `$right`.");
+														};
+													};
+													case 6: {
+														{
+															comparisonExpr = cast {expr : haxe.macro.ExprDef.EUnop(haxe.macro.Unop.OpNot, false, {expr : haxe.macro.ExprDef.ECall({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("hx")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11345)}, "doctest"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11353)}, "internal"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11362)}, "DocTestUtils"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11375)}, "deepEquals"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11386)}, [{expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11387, 11391)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11393, 11398)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11343, 11399)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11342, 11399)};
+															testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` equals `$right`.");
+														};
+													};
+													case 7: {
+														{
+															comparisonExpr = cast {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpGt, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12095, 12099)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12102, 12107)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12095, 12107)};
+															testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not greater than `$right`.");
+														};
+													};
+													case 8: {
+														{
+															comparisonExpr = cast {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpGte, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12334, 12338)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12342, 12347)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12334, 12347)};
+															testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not greater than or equal `$right`.");
+														};
+													};
+													case 9: {
+														{
+															comparisonExpr = cast {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpLt, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11859, 11863)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11866, 11871)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11859, 11871)};
+															testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not lower than `$right`.");
+														};
+													};
+													case 10: {
+														{
+															comparisonExpr = cast {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpLte, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11613, 11617)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11621, 11626)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 11613, 11626)};
+															testFailedExpr = doctestAdapter.generateTestFail(assertion, "Left side `$left` is not lower than or equal `$right`.");
+														};
+													};
+													default: {
+														throw throw haxe.Exception.thrown("Should never be reached");
+													}
+												};
+												testMethodAssertions.push(cast {expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.EVars([{name : "left", type : haxe.macro.ComplexType.TPath({pack : [], name : "Dynamic", params : []}), expr : null, isFinal : cast false, meta : []}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12666, 12683)}, {expr : haxe.macro.ExprDef.ETry({expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAssign, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12714, 12718)}, leftExpr), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12714, 12730)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12712, 12733)}, [{name : "ex", type : haxe.macro.ComplexType.TPath({pack : [], name : "Dynamic", params : []}), expr : {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAssign, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("left")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12753, 12757)}, {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAdd, {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAdd, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CString("exception: ", haxe.macro.StringLiteralKind.DoubleQuotes)), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12760, 12773)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("ex")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12776, 12778)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12760, 12778)}, {expr : haxe.macro.ExprDef.ECall({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("hx")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12783)}, "doctest"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12791)}, "internal"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12800)}, "DocTestUtils"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12813)}, "exceptionStackAsString"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12836)}, []), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12781, 12838)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12760, 12838)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12753, 12838)}}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12708, 12838)}, {expr : haxe.macro.ExprDef.EVars([{name : "right", type : haxe.macro.ComplexType.TPath({pack : [], name : "Dynamic", params : []}), expr : null, isFinal : cast false, meta : []}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12864, 12882)}, {expr : haxe.macro.ExprDef.ETry({expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAssign, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12913, 12918)}, rightExpr), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12913, 12931)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12911, 12934)}, [{name : "ex", type : haxe.macro.ComplexType.TPath({pack : [], name : "Dynamic", params : []}), expr : {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAssign, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("right")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12954, 12959)}, {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAdd, {expr : haxe.macro.ExprDef.EBinop(haxe.macro.Binop.OpAdd, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CString("exception: ", haxe.macro.StringLiteralKind.DoubleQuotes)), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12962, 12975)}, {expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("ex")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12978, 12980)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12962, 12980)}, {expr : haxe.macro.ExprDef.ECall({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("hx")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 12985)}, "doctest"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 12993)}, "internal"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 13002)}, "DocTestUtils"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 13015)}, "exceptionStackAsString"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 13038)}, []), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12983, 13040)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12962, 13040)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12954, 13040)}}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12907, 13040)}, {expr : haxe.macro.ExprDef.EIf(comparisonExpr, {expr : haxe.macro.ExprDef.EBlock([testSuccessExpr]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 13088, 13160)}, {expr : haxe.macro.ExprDef.EBlock([testFailedExpr]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 13166, 13237)}), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 13067, 13237)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", 12640, 13260)});
+											};
+										};
+									};
+									if (testMethodAssertions.length == 0) {
+										continue;
+									};
+									if (testMethodAssertions.length == hx.doctest.DocTestGenerator.MAX_ASSERTIONS_PER_TEST_METHOD || Std.is(doctestAdapter, hx.doctest.internal.adapters.HaxeUnitDocTestAdapter) || Std.is(doctestAdapter, hx.doctest.internal.adapters.MUnitDocTestAdapter)) {
+										testMethodsCount ++;
+										var testMethodName = "test" + src.haxeModuleName + "_" + testMethodsCount;
+										hx.doctest.internal.Logger.log(hx.doctest.internal.Level.DEBUG, "|--> Generating function \"" + testMethodName + "()\"...", {fileName : "/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", lineNumber : 309, className : "hx.doctest.DocTestGenerator", methodName : "generateDocTests"});
+										contextFields.push(doctestAdapter.generateTestMethod(testMethodName, "Doc Testing [" + src.filePath + "] #" + testMethodsCount, testMethodAssertions));
+										testMethodAssertions = new Array();
+									};
+								};
+							};
+						};
+						case 1: {
+							var `2 = `[0];
+							{
+								var condition = `2;
+								{
+									if (condition.indexOf("#end", null) > -1) {
+										continue;
+									};
+									var interp = new hscript.Interp();
+									var reg = new EReg("[a-zA-Z]\\w*", "gi");
+									var defines = haxe.macro.Context.getDefines();
+									var pos = 0;
+									while (reg.matchSub(condition, pos, null)) {
+										var pos2 = reg.matchedPos();
+										var define = reg.matched(0);
+										var defineValue = haxe.ds._Map.Map_Impl_.get(defines, define);
+										haxe.ds._Map.Map_Impl_.set(interp.variables, define, if (defineValue == null) {
+											false;
+										} else {
+											if (defineValue == "1") {
+												true;
+											} else {
+												defineValue;
+											};
+										});
+										pos = reg.matchedPos().pos + reg.matchedPos().len;
+									};
+									try {
+										var result = interp.execute(parser.parseString(condition, null));
+										compilerConditions.push(result);
+									} catch (`:Dynamic) {
+										var ` = haxe.Exception.caught(`);
+										var ` = `.unwrap();
+										if (true) {
+											var ex = `;
+											{
+												hx.doctest.internal.Logger.log(hx.doctest.internal.Level.ERROR, "Failed to parse compiler condition \"#if " + condition + "\" -> " + Std.string(ex), {fileName : "/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", lineNumber : 333, className : "hx.doctest.DocTestGenerator", methodName : "generateDocTests"});
+											};
+										} else throw `;
+									};
+									continue;
+								};
+							};
+						};
+						case 2: {
+							var `3 = `[0];
+							{
+								var condition = `3;
+								{
+									var interp = new hscript.Interp();
+									var reg = new EReg("[a-zA-Z]\\w*", "gi");
+									var defines = haxe.macro.Context.getDefines();
+									var pos = 0;
+									while (reg.matchSub(condition, pos, null)) {
+										var pos2 = reg.matchedPos();
+										var define = reg.matched(0);
+										var defineValue = haxe.ds._Map.Map_Impl_.get(defines, define);
+										haxe.ds._Map.Map_Impl_.set(interp.variables, define, if (defineValue == null) {
+											false;
+										} else {
+											defineValue;
+										});
+										pos = reg.matchedPos().pos + reg.matchedPos().len;
+									};
+									try {
+										var result = interp.execute(parser.parseString(condition, null));
+										if (compilerConditions.length > 0) {
+											compilerConditions.pop();
+										};
+										compilerConditions.push(result);
+									} catch (`:Dynamic) {
+										var ` = haxe.Exception.caught(`);
+										var ` = `.unwrap();
+										if (true) {
+											var ex = `;
+											{
+												hx.doctest.internal.Logger.log(hx.doctest.internal.Level.ERROR, "Failed to parse compiler condition \"#elseif " + condition + "\" -> " + Std.string(ex), {fileName : "/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", lineNumber : 356, className : "hx.doctest.DocTestGenerator", methodName : "generateDocTests"});
+											};
+										} else throw `;
+									};
+									continue;
+								};
+							};
+						};
+						case 3: {
+							{
+								if (compilerConditions.length > 0) {
+									compilerConditions.push(! compilerConditions.pop());
+								};
+								continue;
+							};
+						};
+						case 4: {
+							{
+								if (compilerConditions.length > 0) {
+									compilerConditions.pop();
+								};
+								continue;
+							};
+						};
+					};
+				};
+			};
+			if (testMethodAssertions.length > 0) {
+				testMethodsCount ++;
+				var testMethodName = "test" + src.haxeModuleName + "_" + testMethodsCount;
+				hx.doctest.internal.Logger.log(hx.doctest.internal.Level.DEBUG, "|--> Generating function \"" + testMethodName + "()\"...", {fileName : "/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", lineNumber : 378, className : "hx.doctest.DocTestGenerator", methodName : "generateDocTests"});
+				contextFields.push(doctestAdapter.generateTestMethod(testMethodName, "Doc Testing [" + src.filePath + "] #" + testMethodsCount, testMethodAssertions));
+				testMethodAssertions = new Array();
+			};
+		});
+		doctestAdapter.onFinish(contextFields);
+		hx.doctest.internal.Logger.log(hx.doctest.internal.Level.INFO, "Generated " + totalAssertionsCount[0] + " test assertions.", {fileName : "/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/DocTestGenerator.hx", lineNumber : 386, className : "hx.doctest.DocTestGenerator", methodName : "generateDocTests"});
+		return contextFields;
+	}
+
+	static function getDocTestAdapter() {
+		var clazz = haxe.macro.Context.getLocalClass().get();
+		while (true) {
+			if (clazz.module == "hx.doctest.DocTestRunner") {
+				return new hx.doctest.internal.adapters.TestrunnerDocTestAdapter();
+			};
+			if (clazz.module == "haxe.unit.TestCase") {
+				return new hx.doctest.internal.adapters.HaxeUnitDocTestAdapter();
+			};
+			if (hx.doctest.internal.DocTestUtils.implementsInterface(clazz, "utest.ITest")) {
+				return new hx.doctest.internal.adapters.UTestDocTestAdapter();
+			};
+			if (clazz.superClass == null) {
+				break;
+			};
+			clazz = clazz.superClass.t.get();
+		};
+		return new hx.doctest.internal.adapters.MUnitDocTestAdapter();
+	}
+}

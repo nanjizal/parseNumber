@@ -1,0 +1,41 @@
+@:used
+private class parseNumber._ParseNumber.ParseNumber_Impl_ {
+
+	@:noCompletion
+	public static inline function _new(v:String) {
+		var this1 = parseNumber._ParseNumber.ParseNumber_Fields_.parse(v, true, true, true);
+		return cast this1;
+	}
+
+	public static inline function isValid(this1:String) {
+		return this1 != "NaN";
+	}
+
+	@:to
+	public static inline function toFloat(this1:String) {
+		parseNumber._ParseNumber.ParseNumber_Fields_.parseFloat(this1);
+	}
+
+	@:to
+	public static inline function toInt(this1:String) {
+		parseNumber._ParseNumber.ParseNumber_Fields_.parseInt(this1);
+	}
+
+	public static inline function about(this1:String) {
+		parseNumber._ParseNumber.ParseNumber_Fields_.parseTest(this1);
+	}
+
+	public static inline function fromArray(arr:Array<String>) {
+		var out = new Array();
+		var _g = [];
+		{
+			var _g1 = 0;
+			var _g2 = arr.length;
+			while ((_g1 < _g2)) {
+				var i = _g1 ++;
+				_g.push(parseNumber._ParseNumber.ParseNumber_Impl_._new(arr[i]));
+			};
+		};
+		return _g;
+	}
+}

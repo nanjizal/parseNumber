@@ -1,0 +1,9 @@
+@:flatEnum @:noDoc @:dox(hide)
+enum hx.doctest.internal.Level {
+	DEBUG;
+	INFO;
+	OK;
+	WARN;
+	ERROR;
+	OFF;
+}

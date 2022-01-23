@@ -1,0 +1,404 @@
+private class haxe._Int64.Int64_Impl_ {
+
+	@:noCompletion
+	static inline function _new(x:haxe._Int64.__Int64) {
+		var this;
+		this = x;
+		return cast this;
+	}
+
+	public static inline function copy(this:haxe._Int64.__Int64) return haxe._Int64.Int64_Impl_.make(haxe._Int64.Int64_Impl_.get_high(this), haxe._Int64.Int64_Impl_.get_low(this))
+
+	public static inline function make(high:haxe.Int32, low:haxe.Int32) return haxe._Int64.Int64_Impl_._new(new haxe._Int64.___Int64(high, low))
+
+	@:from
+	public static inline function ofInt(x:Int) return haxe._Int64.Int64_Impl_.make(x >> 31, x)
+
+	public static inline function toInt(x:haxe.Int64) {
+		if (haxe._Int64.Int64_Impl_.get_high(x) != haxe._Int64.Int64_Impl_.get_low(x) >> 31) {
+			throw throw haxe.Exception.thrown("Overflow");
+		};
+		return haxe._Int64.Int64_Impl_.get_low(x);
+	}
+
+	@:deprecated("haxe.Int64.is() is deprecated. Use haxe.Int64.isInt64() instead")
+	public static inline function is(val:Dynamic) {
+		return haxe._Int64.Int64_Impl_.isInt64(val);
+	}
+
+	public static inline function isInt64(val:Dynamic) return Std.isOfType(val, haxe._Int64.___Int64)
+
+	@:deprecated("Use high instead")
+	public static inline function getHigh(x:haxe.Int64) return haxe._Int64.Int64_Impl_.get_high(x)
+
+	@:deprecated("Use low instead")
+	public static inline function getLow(x:haxe.Int64) return haxe._Int64.Int64_Impl_.get_low(x)
+
+	public static inline function isNeg(x:haxe.Int64) return haxe._Int64.Int64_Impl_.get_high(x) < 0
+
+	public static inline function isZero(x:haxe.Int64) return haxe._Int64.Int64_Impl_.eq(x, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(0))
+
+	public static inline function compare(a:haxe.Int64, b:haxe.Int64) {
+		var v = haxe._Int32.Int32_Impl_.sub(haxe._Int64.Int64_Impl_.get_high(a), haxe._Int64.Int64_Impl_.get_high(b));
+		v = if (v != 0) {
+			v;
+		} else {
+			haxe._Int32.Int32_Impl_.ucompare(haxe._Int64.Int64_Impl_.get_low(a), haxe._Int64.Int64_Impl_.get_low(b));
+		};
+		return if (haxe._Int64.Int64_Impl_.get_high(a) < 0) {
+			(if (haxe._Int64.Int64_Impl_.get_high(b) < 0) {
+				v;
+			} else {
+				-1;
+			});
+		} else {
+			(if (haxe._Int64.Int64_Impl_.get_high(b) >= 0) {
+				v;
+			} else {
+				1;
+			});
+		};
+	}
+
+	public static inline function ucompare(a:haxe.Int64, b:haxe.Int64) {
+		var v = haxe._Int32.Int32_Impl_.ucompare(haxe._Int64.Int64_Impl_.get_high(a), haxe._Int64.Int64_Impl_.get_high(b));
+		return if (v != 0) {
+			v;
+		} else {
+			haxe._Int32.Int32_Impl_.ucompare(haxe._Int64.Int64_Impl_.get_low(a), haxe._Int64.Int64_Impl_.get_low(b));
+		};
+	}
+
+	public static inline function toStr(x:haxe.Int64) return haxe._Int64.Int64_Impl_.toString(x)
+
+	static function toString(this:haxe._Int64.__Int64) {
+		var i = cast this;
+		if (haxe._Int64.Int64_Impl_.eq(i, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(0))) {
+			return "0";
+		};
+		var str = "";
+		var neg = false;
+		if (haxe._Int64.Int64_Impl_.isNeg(i)) {
+			neg = true;
+		};
+		var ten = @:implicitCast haxe._Int64.Int64_Impl_.ofInt(10);
+		while (haxe._Int64.Int64_Impl_.neq(i, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(0))) {
+			var r = haxe._Int64.Int64_Impl_.divMod(i, ten);
+			if (haxe._Int64.Int64_Impl_.isNeg(r.modulus)) {
+				str = haxe._Int64.Int64_Impl_.get_low(haxe._Int64.Int64_Impl_.neg(r.modulus)) + str;
+				i = haxe._Int64.Int64_Impl_.neg(r.quotient);
+			} else {
+				str = haxe._Int64.Int64_Impl_.get_low(r.modulus) + str;
+				i = r.quotient;
+			};
+		};
+		if (neg) {
+			str = "-" + str;
+		};
+		return str;
+	}
+
+	public static inline function parseString(sParam:String) {
+		return haxe.Int64Helper.parseString(sParam);
+	}
+
+	public static inline function fromFloat(f:Float) {
+		return haxe.Int64Helper.fromFloat(f);
+	}
+
+	public static function divMod(dividend:haxe.Int64, divisor:haxe.Int64) {
+		if (haxe._Int64.Int64_Impl_.get_high(divisor) == 0) {
+			@:ast(switch (divisor.low) {
+	case 0:
+		throw "divide by zero";	
+	case 1:
+		return { quotient : dividend.copy(), modulus : 0 };	
+}) {
+				var ` = haxe._Int64.Int64_Impl_.get_low(divisor);
+				switch (`) {
+					case 0: {
+						{
+							throw throw haxe.Exception.thrown("divide by zero");
+						};
+					};
+					case 1: {
+						{
+							return {quotient : haxe._Int64.Int64_Impl_.copy(dividend), modulus : @:implicitCast haxe._Int64.Int64_Impl_.ofInt(0)};
+						};
+					};
+				};
+			};
+		};
+		var divSign = haxe._Int64.Int64_Impl_.isNeg(dividend) != haxe._Int64.Int64_Impl_.isNeg(divisor);
+		var modulus = if (haxe._Int64.Int64_Impl_.isNeg(dividend)) {
+			haxe._Int64.Int64_Impl_.neg(dividend);
+		} else {
+			haxe._Int64.Int64_Impl_.copy(dividend);
+		};
+		divisor = if (haxe._Int64.Int64_Impl_.isNeg(divisor)) {
+			haxe._Int64.Int64_Impl_.neg(divisor);
+		} else {
+			divisor;
+		};
+		var quotient = @:implicitCast haxe._Int64.Int64_Impl_.ofInt(0);
+		var mask = @:implicitCast haxe._Int64.Int64_Impl_.ofInt(1);
+		while (! haxe._Int64.Int64_Impl_.isNeg(divisor)) {
+			var cmp = haxe._Int64.Int64_Impl_.ucompare(divisor, modulus);
+			divisor = haxe._Int64.Int64_Impl_.shl(divisor, 1);
+			mask = haxe._Int64.Int64_Impl_.shl(mask, 1);
+			if (cmp >= 0) {
+				break;
+			};
+		};
+		while (haxe._Int64.Int64_Impl_.neq(mask, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(0))) {
+			if (haxe._Int64.Int64_Impl_.ucompare(modulus, divisor) >= 0) {
+				quotient = haxe._Int64.Int64_Impl_.or(quotient, mask);
+				modulus = haxe._Int64.Int64_Impl_.sub(modulus, divisor);
+			};
+			mask = haxe._Int64.Int64_Impl_.ushr(mask, 1);
+			divisor = haxe._Int64.Int64_Impl_.ushr(divisor, 1);
+		};
+		if (divSign) {
+			quotient = haxe._Int64.Int64_Impl_.neg(quotient);
+		};
+		if (haxe._Int64.Int64_Impl_.isNeg(dividend)) {
+			modulus = haxe._Int64.Int64_Impl_.neg(modulus);
+		};
+		return {quotient : quotient, modulus : modulus};
+	}
+
+	@:op(-A)
+	public static inline function neg(x:haxe.Int64) {
+		var high = ~ haxe._Int64.Int64_Impl_.get_high(x);
+		var low = haxe._Int32.Int32_Impl_.negate(haxe._Int64.Int64_Impl_.get_low(x));
+		if (low == 0) {
+			haxe._Int32.Int32_Impl_.postIncrement(high);
+		};
+		return haxe._Int64.Int64_Impl_.make(high, low);
+	}
+
+	@:op(++A)
+	static inline function preIncrement(this:haxe._Int64.__Int64) {
+		this = haxe._Int64.Int64_Impl_.copy(this);
+		haxe._Int32.Int32_Impl_.postIncrement(this.low);
+		if (this.low == 0) {
+			haxe._Int32.Int32_Impl_.postIncrement(this.high);
+		};
+		return cast this;
+	}
+
+	@:op(A++)
+	static inline function postIncrement(this:haxe._Int64.__Int64) {
+		var ret = this;
+		haxe._Int64.Int64_Impl_.preIncrement(this);
+		return ret;
+	}
+
+	@:op(--A)
+	static inline function preDecrement(this:haxe._Int64.__Int64) {
+		this = haxe._Int64.Int64_Impl_.copy(this);
+		if (this.low == 0) {
+			haxe._Int32.Int32_Impl_.postDecrement(this.high);
+		};
+		haxe._Int32.Int32_Impl_.postDecrement(this.low);
+		return cast this;
+	}
+
+	@:op(A--)
+	static inline function postDecrement(this:haxe._Int64.__Int64) {
+		var ret = this;
+		haxe._Int64.Int64_Impl_.preDecrement(this);
+		return ret;
+	}
+
+	@:op(A + B)
+	public static inline function add(a:haxe.Int64, b:haxe.Int64) {
+		var high = haxe._Int32.Int32_Impl_.add(haxe._Int64.Int64_Impl_.get_high(a), haxe._Int64.Int64_Impl_.get_high(b));
+		var low = haxe._Int32.Int32_Impl_.add(haxe._Int64.Int64_Impl_.get_low(a), haxe._Int64.Int64_Impl_.get_low(b));
+		if (haxe._Int32.Int32_Impl_.ucompare(low, haxe._Int64.Int64_Impl_.get_low(a)) < 0) {
+			haxe._Int32.Int32_Impl_.postIncrement(high);
+		};
+		return haxe._Int64.Int64_Impl_.make(high, low);
+	}
+
+	@:op(A + B) @:commutative
+	static inline function addInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.add(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A - B)
+	public static inline function sub(a:haxe.Int64, b:haxe.Int64) {
+		var high = haxe._Int32.Int32_Impl_.sub(haxe._Int64.Int64_Impl_.get_high(a), haxe._Int64.Int64_Impl_.get_high(b));
+		var low = haxe._Int32.Int32_Impl_.sub(haxe._Int64.Int64_Impl_.get_low(a), haxe._Int64.Int64_Impl_.get_low(b));
+		if (haxe._Int32.Int32_Impl_.ucompare(haxe._Int64.Int64_Impl_.get_low(a), haxe._Int64.Int64_Impl_.get_low(b)) < 0) {
+			haxe._Int32.Int32_Impl_.postDecrement(high);
+		};
+		return haxe._Int64.Int64_Impl_.make(high, low);
+	}
+
+	@:op(A - B)
+	static inline function subInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.sub(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A - B)
+	static inline function intSub(a:Int, b:haxe.Int64) return haxe._Int64.Int64_Impl_.sub(@:implicitCast haxe._Int64.Int64_Impl_.ofInt(a), b)
+
+	@:op(A * B)
+	public static inline function mul(a:haxe.Int64, b:haxe.Int64) {
+		var mask = 65535;
+		var al = haxe._Int64.Int64_Impl_.get_low(a) & mask;
+		var ah = haxe._Int64.Int64_Impl_.get_low(a) >>> 16;
+		var bl = haxe._Int64.Int64_Impl_.get_low(b) & mask;
+		var bh = haxe._Int64.Int64_Impl_.get_low(b) >>> 16;
+		var p00 = al * bl;
+		var p10 = ah * bl;
+		var p01 = al * bh;
+		var p11 = ah * bh;
+		var low = p00;
+		var high = haxe._Int32.Int32_Impl_.add(haxe._Int32.Int32_Impl_.add(p11, (p01 >>> 16)), (p10 >>> 16));
+		p01 <<= 16;
+		low = haxe._Int32.Int32_Impl_.add(low, p01);
+		if (haxe._Int32.Int32_Impl_.ucompare(low, p01) < 0) {
+			haxe._Int32.Int32_Impl_.postIncrement(high);
+		};
+		p10 <<= 16;
+		low = haxe._Int32.Int32_Impl_.add(low, p10);
+		if (haxe._Int32.Int32_Impl_.ucompare(low, p10) < 0) {
+			haxe._Int32.Int32_Impl_.postIncrement(high);
+		};
+		high = haxe._Int32.Int32_Impl_.add(high, haxe._Int32.Int32_Impl_.add(haxe._Int64.Int64_Impl_.get_low(a) * haxe._Int64.Int64_Impl_.get_high(b), haxe._Int64.Int64_Impl_.get_high(a) * haxe._Int64.Int64_Impl_.get_low(b)));
+		return haxe._Int64.Int64_Impl_.make(high, low);
+	}
+
+	@:op(A * B) @:commutative
+	static inline function mulInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.mul(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A / B)
+	public static inline function div(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.divMod(a, b).quotient
+
+	@:op(A / B)
+	static inline function divInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.div(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A / B)
+	static inline function intDiv(a:Int, b:haxe.Int64) return @:implicitCast haxe._Int64.Int64_Impl_.ofInt(haxe._Int64.Int64_Impl_.toInt(haxe._Int64.Int64_Impl_.div(@:implicitCast haxe._Int64.Int64_Impl_.ofInt(a), b)))
+
+	@:op(A % B)
+	public static inline function mod(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.divMod(a, b).modulus
+
+	@:op(A % B)
+	static inline function modInt(a:haxe.Int64, b:Int) return @:implicitCast haxe._Int64.Int64_Impl_.ofInt(haxe._Int64.Int64_Impl_.toInt(haxe._Int64.Int64_Impl_.mod(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))))
+
+	@:op(A % B)
+	static inline function intMod(a:Int, b:haxe.Int64) return @:implicitCast haxe._Int64.Int64_Impl_.ofInt(haxe._Int64.Int64_Impl_.toInt(haxe._Int64.Int64_Impl_.mod(@:implicitCast haxe._Int64.Int64_Impl_.ofInt(a), b)))
+
+	@:op(A == B)
+	public static inline function eq(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.get_high(a) == haxe._Int64.Int64_Impl_.get_high(b) && haxe._Int64.Int64_Impl_.get_low(a) == haxe._Int64.Int64_Impl_.get_low(b)
+
+	@:op(A == B) @:commutative
+	static inline function eqInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.eq(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A != B)
+	public static inline function neq(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.get_high(a) != haxe._Int64.Int64_Impl_.get_high(b) || haxe._Int64.Int64_Impl_.get_low(a) != haxe._Int64.Int64_Impl_.get_low(b)
+
+	@:op(A != B) @:commutative
+	static inline function neqInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.neq(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A < B)
+	static inline function lt(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.compare(a, b) < 0
+
+	@:op(A < B)
+	static inline function ltInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.lt(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A < B)
+	static inline function intLt(a:Int, b:haxe.Int64) return haxe._Int64.Int64_Impl_.lt(@:implicitCast haxe._Int64.Int64_Impl_.ofInt(a), b)
+
+	@:op(A <= B)
+	static inline function lte(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.compare(a, b) <= 0
+
+	@:op(A <= B)
+	static inline function lteInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.lte(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A <= B)
+	static inline function intLte(a:Int, b:haxe.Int64) return haxe._Int64.Int64_Impl_.lte(@:implicitCast haxe._Int64.Int64_Impl_.ofInt(a), b)
+
+	@:op(A > B)
+	static inline function gt(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.compare(a, b) > 0
+
+	@:op(A > B)
+	static inline function gtInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.gt(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A > B)
+	static inline function intGt(a:Int, b:haxe.Int64) return haxe._Int64.Int64_Impl_.gt(@:implicitCast haxe._Int64.Int64_Impl_.ofInt(a), b)
+
+	@:op(A >= B)
+	static inline function gte(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.compare(a, b) >= 0
+
+	@:op(A >= B)
+	static inline function gteInt(a:haxe.Int64, b:Int) return haxe._Int64.Int64_Impl_.gte(a, @:implicitCast haxe._Int64.Int64_Impl_.ofInt(b))
+
+	@:op(A >= B)
+	static inline function intGte(a:Int, b:haxe.Int64) return haxe._Int64.Int64_Impl_.gte(@:implicitCast haxe._Int64.Int64_Impl_.ofInt(a), b)
+
+	@:op(~A)
+	static inline function complement(a:haxe.Int64) return haxe._Int64.Int64_Impl_.make(~ haxe._Int64.Int64_Impl_.get_high(a), ~ haxe._Int64.Int64_Impl_.get_low(a))
+
+	@:op(A & B)
+	public static inline function and(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.make(haxe._Int64.Int64_Impl_.get_high(a) & haxe._Int64.Int64_Impl_.get_high(b), haxe._Int64.Int64_Impl_.get_low(a) & haxe._Int64.Int64_Impl_.get_low(b))
+
+	@:op(A | B)
+	public static inline function or(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.make(haxe._Int64.Int64_Impl_.get_high(a) | haxe._Int64.Int64_Impl_.get_high(b), haxe._Int64.Int64_Impl_.get_low(a) | haxe._Int64.Int64_Impl_.get_low(b))
+
+	@:op(A ^ B)
+	public static inline function xor(a:haxe.Int64, b:haxe.Int64) return haxe._Int64.Int64_Impl_.make(haxe._Int64.Int64_Impl_.get_high(a) ^ haxe._Int64.Int64_Impl_.get_high(b), haxe._Int64.Int64_Impl_.get_low(a) ^ haxe._Int64.Int64_Impl_.get_low(b))
+
+	@:op(A << B)
+	public static inline function shl(a:haxe.Int64, b:Int) {
+		b &= 63;
+		return if (b == 0) {
+			haxe._Int64.Int64_Impl_.copy(a);
+		} else {
+			if (b < 32) {
+				haxe._Int64.Int64_Impl_.make((haxe._Int64.Int64_Impl_.get_high(a) << b) | (haxe._Int64.Int64_Impl_.get_low(a) >>> (32 - b)), haxe._Int64.Int64_Impl_.get_low(a) << b);
+			} else {
+				haxe._Int64.Int64_Impl_.make(haxe._Int64.Int64_Impl_.get_low(a) << (b - 32), 0);
+			};
+		};
+	}
+
+	@:op(A >> B)
+	public static inline function shr(a:haxe.Int64, b:Int) {
+		b &= 63;
+		return if (b == 0) {
+			haxe._Int64.Int64_Impl_.copy(a);
+		} else {
+			if (b < 32) {
+				haxe._Int64.Int64_Impl_.make(haxe._Int64.Int64_Impl_.get_high(a) >> b, (haxe._Int64.Int64_Impl_.get_high(a) << (32 - b)) | (haxe._Int64.Int64_Impl_.get_low(a) >>> b));
+			} else {
+				haxe._Int64.Int64_Impl_.make(haxe._Int64.Int64_Impl_.get_high(a) >> 31, haxe._Int64.Int64_Impl_.get_high(a) >> (b - 32));
+			};
+		};
+	}
+
+	@:op(A >>> B)
+	public static inline function ushr(a:haxe.Int64, b:Int) {
+		b &= 63;
+		return if (b == 0) {
+			haxe._Int64.Int64_Impl_.copy(a);
+		} else {
+			if (b < 32) {
+				haxe._Int64.Int64_Impl_.make(haxe._Int64.Int64_Impl_.get_high(a) >>> b, (haxe._Int64.Int64_Impl_.get_high(a) << (32 - b)) | (haxe._Int64.Int64_Impl_.get_low(a) >>> b));
+			} else {
+				haxe._Int64.Int64_Impl_.make(0, haxe._Int64.Int64_Impl_.get_high(a) >>> (b - 32));
+			};
+		};
+	}
+
+	public static var high(get,never):haxe.Int32;
+
+	static inline function get_high(this:haxe._Int64.__Int64) return this.high
+
+	static inline function set_high(this:haxe._Int64.__Int64, x:haxe.Int32) return this.high = x
+
+	public static var low(get,never):haxe.Int32;
+
+	static inline function get_low(this:haxe._Int64.__Int64) return this.low
+
+	static inline function set_low(this:haxe._Int64.__Int64, x:haxe.Int32) return this.low = x
+}
