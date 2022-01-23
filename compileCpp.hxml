@@ -1,0 +1,6 @@
+-cp src
+-main parseNumber.MainParseNumber
+--cpp cpp
+--next
+-cmd cd cpp
+-cmd ./MainParseNumber

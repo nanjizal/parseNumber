@@ -1,0 +1,1 @@
+abstract js.lib.KeyValue<K, V> {}

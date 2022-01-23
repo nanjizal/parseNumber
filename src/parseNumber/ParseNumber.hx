@@ -36,13 +36,86 @@ function parseInt( no: String ){
     Std.parseFloat( no );
 }
 // scientific exponent notation not setup/available.
-function parse( no: String ){
+    /**
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'trimming start and end spaces " -100.000 " = ' +  parse(' -100.000 '));
+     * ... var no: String = parse(' -100.000 ');
+     * ... no == '-100.000'; }) == true
+     * </code></pre>
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'accpetance of hex number "0xFFFF00" = ' + parse('0xFFFF00'));
+     * ... var no: String = parse('0xFFFF00');
+     * ... no == '0xFFFF00'; }) == true
+     * </code></pre>
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'removal of leading zeros "  01" = ' + parse('  01'));
+     * ... var no: String = parse('  01');
+     * ... no == '1'; }) == true
+     * </code></pre>
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'not allowing multiple dots "1.2.3" = ' + parse('1.2.3'));
+     * ... var no: String = parse('1.2.3');
+     * ... no == 'NaN'; }) == true
+     * </code></pre>
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'stripping out underscores and commas  "1,2_3" = ' + parse('1,2_3'));
+     * ... var no: String = parse('1,2_3');
+     * ... no == '123'; }) == true
+     * </code></pre>
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'not allowing negative symbol within number "800-83b9" = ' + parse('800-83b9'));
+     * ... var no: String = parse('800-83b9');
+     * ... no == 'NaN'; }) == true
+     * </code></pre>
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'not accepting hex numbers above ARGB "0xffFFffFFf" = ' + parse('0xffFFffFFf'));
+     * ... var no: String = parse('0xffFFffFFf');
+     * ... no == 'NaN'; }) == true
+     * </code></pre>
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'testing scientific, need to set allowScientific "123e5" = ' + parse('123e5', true));
+     * ... var no: String = parse('123e5', true);
+     * ... no == '123e5'; }) == true
+     * </code></pre>
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'testing scientific, need to set allowScientific "123e-5 " = ' + parse('123e-5 ',true));
+     * ... var no: String = parse('123e-5 ', true);
+     * ... no == '123e-5'; }) == true
+     * </code></pre>
+     *
+     * 
+     * <pre><code>
+     * >>> ({ 
+     * ... trace( 'testing scientific, need to set allowScientific "123e-5 e" = ' + parse('123e-5 e',true));
+     * ... var no: String = parse('123e-5 e', true);
+     * ... no == 'NaN'; }) == true
+     * </code></pre>
+     */
+function parse( no: String, allowScientific = false ){
     var str = new StringCodeIterator( no );
     var temp: String = '';
     var count = 0;
     var isNumber = true;
     var dotCount = 0;
     var hasX = false;
+    var isScientific = false;
     str.next();
     while( str.hasNext() ){
         //trace( str.c );
@@ -75,6 +148,10 @@ function parse( no: String ){
                     @:privateAccess  str.b = new StringBuf();
                 }
             }
+        }
+        if( str.c == '_'.code || str.c == ','.code ){
+            str.next();
+            continue;
         }
         switch( str.c ) {
             case '.'.code:
@@ -111,12 +188,81 @@ function parse( no: String ){
                 ,'F'.code
                 :
                 if( hasX ) {
-                    if( count < 11 ){
+                    if( count < ('0xFFffFFf'.length) ){
                         str.addChar();
                     } else {
-                        str.addChar();
-                        //trace( 'hex too long?' );
+                        isNumber = false;
+                        break;
+                        trace( 'hex too long?' );
                     }
+                } else if( allowScientific ){
+                    // check for scientific exponents
+                    // rather heavy 
+                    // need to check the rest of the letter before deciding to add e.
+                    if( str.c == 'e'.code || str.c == "E".code ) {
+                        @:privateAccess  var letters = str.str;
+                        var someNumerics = false;
+                        var curPos = str.pos;
+                        for( i in (str.pos)...letters.length ){
+                            var no = StringTools.fastCodeAt( letters, i );
+                            curPos = i;
+                            switch( no ){
+                                case '0'.code
+                                    ,'1'.code
+                                    ,'2'.code
+                                    ,'3'.code
+                                    ,'4'.code
+                                    ,'5'.code
+                                    ,'6'.code
+                                    ,'7'.code
+                                    ,'8'.code
+                                    ,'9'.code
+                                    :
+                                    someNumerics = true;
+                                case '-'.code:
+                                    // only allow negative sign just after the e
+                                    if( !( i == str.pos ) ){
+                                        isNumber = false;
+                                        break;
+                                    } else {
+                                        //'allowing negative' );
+                                    }
+                                default:
+                                    break;
+                            }
+                        }
+                        if( someNumerics == false ){
+                            isNumber = false;
+                        }
+                        if( isNumber == false ) break;
+                        for( i in curPos...letters.length ){
+                            // with scientific after the number only allow spaces
+                            switch( i ){
+                                case ' '.code:
+                                    // ok :)
+                                default:
+                                    isNumber == false;
+                                    break;
+                            }
+                        }
+                        if( isNumber == false ) {
+                            break;
+                        } else {
+                            // allow e and continue normally.
+                            isScientific = true;
+                            str.addChar();
+                        }
+                    } else {
+                        isNumber = false;
+                        break;
+                    }
+                } else {
+                    isNumber = false;
+                    break;
+                }
+            case '-'.code:
+                if( isScientific == true ){
+                    str.addChar();
                 } else {
                     isNumber = false;
                     break;

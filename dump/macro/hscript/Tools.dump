@@ -1,0 +1,877 @@
+class hscript.Tools {
+
+	public static function iter(e:hscript.Expr, f:hscript.Expr -> Void) {
+		@:ast(switch (expr(e)) {
+	case EConst(_), EIdent(_):
+	case EVar(_, _, e):
+		if (e != null) f(e);	
+	case EParent(e):
+		f(e);	
+	case EBlock(el):
+		for (e  in  el) f(e);	
+	case EField(e, _):
+		f(e);	
+	case EBinop(_, e1, e2):
+		f(e1);
+		f(e2);	
+	case EUnop(_, _, e):
+		f(e);	
+	case ECall(e, args):
+		f(e);
+		for (a  in  args) f(a);	
+	case EIf(c, e1, e2):
+		f(c);
+		f(e1);
+		if (e2 != null) f(e2);	
+	case EWhile(c, e):
+		f(c);
+		f(e);	
+	case EDoWhile(c, e):
+		f(c);
+		f(e);	
+	case EFor(_, it, e):
+		f(it);
+		f(e);	
+	case EBreak, EContinue:
+	case EFunction(_, e, _, _):
+		f(e);	
+	case EReturn(e):
+		if (e != null) f(e);	
+	case EArray(e, i):
+		f(e);
+		f(i);	
+	case EArrayDecl(el):
+		for (e  in  el) f(e);	
+	case ENew(_, el):
+		for (e  in  el) f(e);	
+	case EThrow(e):
+		f(e);	
+	case ETry(e, _, _, c):
+		f(e);
+		f(c);	
+	case EObject(fl):
+		for (fi  in  fl) f(fi.e);	
+	case ETernary(c, e1, e2):
+		f(c);
+		f(e1);
+		f(e2);	
+	case ESwitch(e, cases, def):
+		f(e);
+		for (c  in  cases) {
+			for (v  in  c.values) f(v);
+			f(c.expr);
+		};
+		if (def != null) f(def);	
+	case EMeta(name, args, e):
+		if (args != null) for (a  in  args) f(a);
+		f(e);	
+	case ECheckType(e, _):
+		f(e);	
+}) {
+			var ` = hscript.Tools.expr(e);
+			switch (@:exhaustive enumIndex `) {
+				case 0: {
+					var `27 = `[0];
+					{};
+				};
+				case 1: {
+					var `3 = `[0];
+					{};
+				};
+				case 2: {
+					var `12 = `[0];
+					var `13 = `[1];
+					var `14 = `[2];
+					{
+						var e = `14;
+						{
+							if (e != null) {
+								f(e);
+							};
+						};
+					};
+				};
+				case 3: {
+					var `8 = `[0];
+					{
+						var e = `8;
+						{
+							f(e);
+						};
+					};
+				};
+				case 4: {
+					var `47 = `[0];
+					{
+						var el = `47;
+						{
+							{
+								var ` = 0;
+								while (` < el.length) {
+									var e = el[`];
+									++ `;
+									f(e);
+								};
+							};
+						};
+					};
+				};
+				case 5: {
+					var `48 = `[0];
+					var `49 = `[1];
+					{
+						var e = `48;
+						{
+							f(e);
+						};
+					};
+				};
+				case 6: {
+					var `39 = `[0];
+					var `40 = `[1];
+					var `41 = `[2];
+					{
+						var e1 = `40;
+						var e2 = `41;
+						{
+							f(e1);
+							f(e2);
+						};
+					};
+				};
+				case 7: {
+					var `28 = `[0];
+					var `29 = `[1];
+					var `30 = `[2];
+					{
+						var e = `30;
+						{
+							f(e);
+						};
+					};
+				};
+				case 8: {
+					var `21 = `[0];
+					var `22 = `[1];
+					{
+						var e = `21;
+						var args = `22;
+						{
+							f(e);
+							{
+								var ` = 0;
+								while (` < args.length) {
+									var a = args[`];
+									++ `;
+									f(a);
+								};
+							};
+						};
+					};
+				};
+				case 9: {
+					var `50 = `[0];
+					var `51 = `[1];
+					var `52 = `[2];
+					{
+						var c = `50;
+						var e1 = `51;
+						var e2 = `52;
+						{
+							f(c);
+							f(e1);
+							if (e2 != null) {
+								f(e2);
+							};
+						};
+					};
+				};
+				case 10: {
+					var `9 = `[0];
+					var `10 = `[1];
+					{
+						var c = `9;
+						var e = `10;
+						{
+							f(c);
+							f(e);
+						};
+					};
+				};
+				case 11: {
+					var `36 = `[0];
+					var `37 = `[1];
+					var `38 = `[2];
+					{
+						var it = `37;
+						var e = `38;
+						{
+							f(it);
+							f(e);
+						};
+					};
+				};
+				case 12, 13: {
+					{};
+				};
+				case 14: {
+					var `23 = `[0];
+					var `24 = `[1];
+					var `25 = `[2];
+					var `26 = `[3];
+					{
+						var e = `24;
+						{
+							f(e);
+						};
+					};
+				};
+				case 15: {
+					var `1 = `[0];
+					{
+						var e = `1;
+						{
+							if (e != null) {
+								f(e);
+							};
+						};
+					};
+				};
+				case 16: {
+					var `53 = `[0];
+					var `54 = `[1];
+					{
+						var e = `53;
+						var i = `54;
+						{
+							f(e);
+							f(i);
+						};
+					};
+				};
+				case 17: {
+					var `31 = `[0];
+					{
+						var el = `31;
+						{
+							{
+								var ` = 0;
+								while (` < el.length) {
+									var e = el[`];
+									++ `;
+									f(e);
+								};
+							};
+						};
+					};
+				};
+				case 18: {
+					var `4 = `[0];
+					var `5 = `[1];
+					{
+						var el = `5;
+						{
+							{
+								var ` = 0;
+								while (` < el.length) {
+									var e = el[`];
+									++ `;
+									f(e);
+								};
+							};
+						};
+					};
+				};
+				case 19: {
+					var `11 = `[0];
+					{
+						var e = `11;
+						{
+							f(e);
+						};
+					};
+				};
+				case 20: {
+					var `32 = `[0];
+					var `33 = `[1];
+					var `34 = `[2];
+					var `35 = `[3];
+					{
+						var e = `32;
+						var c = `35;
+						{
+							f(e);
+							f(c);
+						};
+					};
+				};
+				case 21: {
+					var `2 = `[0];
+					{
+						var fl = `2;
+						{
+							{
+								var ` = 0;
+								while (` < fl.length) {
+									var fi = fl[`];
+									++ `;
+									f(fi.e);
+								};
+							};
+						};
+					};
+				};
+				case 22: {
+					var `18 = `[0];
+					var `19 = `[1];
+					var `20 = `[2];
+					{
+						var c = `18;
+						var e1 = `19;
+						var e2 = `20;
+						{
+							f(c);
+							f(e1);
+							f(e2);
+						};
+					};
+				};
+				case 23: {
+					var `15 = `[0];
+					var `16 = `[1];
+					var `17 = `[2];
+					{
+						var e = `15;
+						var cases = `16;
+						var def = `17;
+						{
+							f(e);
+							{
+								var ` = 0;
+								while (` < cases.length) {
+									var c = cases[`];
+									++ `;
+									{
+										var ` = 0;
+										var `1 = c.values;
+										while (` < `1.length) {
+											var v = `1[`];
+											++ `;
+											f(v);
+										};
+									};
+									f(c.expr);
+								};
+							};
+							if (def != null) {
+								f(def);
+							};
+						};
+					};
+				};
+				case 24: {
+					var `42 = `[0];
+					var `43 = `[1];
+					{
+						var c = `42;
+						var e = `43;
+						{
+							f(c);
+							f(e);
+						};
+					};
+				};
+				case 25: {
+					var `44 = `[0];
+					var `45 = `[1];
+					var `46 = `[2];
+					{
+						var name = `44;
+						var args = `45;
+						var e = `46;
+						{
+							if (args != null) {
+								{
+									var ` = 0;
+									while (` < args.length) {
+										var a = args[`];
+										++ `;
+										f(a);
+									};
+								};
+							};
+							f(e);
+						};
+					};
+				};
+				case 26: {
+					var `6 = `[0];
+					var `7 = `[1];
+					{
+						var e = `6;
+						{
+							f(e);
+						};
+					};
+				};
+			};
+		};
+	}
+
+	public static function map(e:hscript.Expr, f:hscript.Expr -> hscript.Expr) {
+		var edef = @:ast(switch (expr(e)) {
+	case EConst(_), EIdent(_), EBreak, EContinue:
+		expr(e);	
+	case EVar(n, t, e):
+		EVar(n, t, if (e != null) f(e) else null);	
+	case EParent(e):
+		EParent(f(e));	
+	case EBlock(el):
+		EBlock([for (e  in  el) f(e)]);	
+	case EField(e, fi):
+		EField(f(e), fi);	
+	case EBinop(op, e1, e2):
+		EBinop(op, f(e1), f(e2));	
+	case EUnop(op, pre, e):
+		EUnop(op, pre, f(e));	
+	case ECall(e, args):
+		ECall(f(e), [for (a  in  args) f(a)]);	
+	case EIf(c, e1, e2):
+		EIf(f(c), f(e1), if (e2 != null) f(e2) else null);	
+	case EWhile(c, e):
+		EWhile(f(c), f(e));	
+	case EDoWhile(c, e):
+		EDoWhile(f(c), f(e));	
+	case EFor(v, it, e):
+		EFor(v, f(it), f(e));	
+	case EFunction(args, e, name, t):
+		EFunction(args, f(e), name, t);	
+	case EReturn(e):
+		EReturn(if (e != null) f(e) else null);	
+	case EArray(e, i):
+		EArray(f(e), f(i));	
+	case EArrayDecl(el):
+		EArrayDecl([for (e  in  el) f(e)]);	
+	case ENew(cl, el):
+		ENew(cl, [for (e  in  el) f(e)]);	
+	case EThrow(e):
+		EThrow(f(e));	
+	case ETry(e, v, t, c):
+		ETry(f(e), v, t, f(c));	
+	case EObject(fl):
+		EObject([for (fi  in  fl) { name : fi.name, e : f(fi.e) }]);	
+	case ETernary(c, e1, e2):
+		ETernary(f(c), f(e1), f(e2));	
+	case ESwitch(e, cases, def):
+		ESwitch(f(e), [for (c  in  cases) { values : [for (v  in  c.values) f(v)], expr : f(c.expr) }], def == null ? null : f(def));	
+	case EMeta(name, args, e):
+		EMeta(name, args == null ? null : [for (a  in  args) f(a)], f(e));	
+	case ECheckType(e, t):
+		ECheckType(f(e), t);	
+}) {
+			var ` = hscript.Tools.expr(e);
+			switch (@:exhaustive enumIndex `) {
+				case 0: {
+					var `27 = `[0];
+					{
+						hscript.Tools.expr(e);
+					};
+				};
+				case 1: {
+					var `3 = `[0];
+					{
+						hscript.Tools.expr(e);
+					};
+				};
+				case 2: {
+					var `12 = `[0];
+					var `13 = `[1];
+					var `14 = `[2];
+					{
+						var n = `12;
+						var t = `13;
+						var e = `14;
+						{
+							hscript.Expr.EVar(n, t, if (e != null) {
+								f(e);
+							} else {
+								null;
+							});
+						};
+					};
+				};
+				case 3: {
+					var `8 = `[0];
+					{
+						var e = `8;
+						{
+							hscript.Expr.EParent(f(e));
+						};
+					};
+				};
+				case 4: {
+					var `47 = `[0];
+					{
+						var el = `47;
+						{
+							hscript.Expr.EBlock({
+								var ` = [];
+								{
+									var `1 = 0;
+									while (`1 < el.length) {
+										var e = el[`1];
+										++ `1;
+										`.push(f(e));
+									};
+								};
+								`;
+							});
+						};
+					};
+				};
+				case 5: {
+					var `48 = `[0];
+					var `49 = `[1];
+					{
+						var e = `48;
+						var fi = `49;
+						{
+							hscript.Expr.EField(f(e), fi);
+						};
+					};
+				};
+				case 6: {
+					var `39 = `[0];
+					var `40 = `[1];
+					var `41 = `[2];
+					{
+						var op = `39;
+						var e1 = `40;
+						var e2 = `41;
+						{
+							hscript.Expr.EBinop(op, f(e1), f(e2));
+						};
+					};
+				};
+				case 7: {
+					var `28 = `[0];
+					var `29 = `[1];
+					var `30 = `[2];
+					{
+						var op = `28;
+						var pre = `29;
+						var e = `30;
+						{
+							hscript.Expr.EUnop(op, pre, f(e));
+						};
+					};
+				};
+				case 8: {
+					var `21 = `[0];
+					var `22 = `[1];
+					{
+						var e = `21;
+						var args = `22;
+						{
+							hscript.Expr.ECall(f(e), {
+								var ` = [];
+								{
+									var `1 = 0;
+									while (`1 < args.length) {
+										var a = args[`1];
+										++ `1;
+										`.push(f(a));
+									};
+								};
+								`;
+							});
+						};
+					};
+				};
+				case 9: {
+					var `50 = `[0];
+					var `51 = `[1];
+					var `52 = `[2];
+					{
+						var c = `50;
+						var e1 = `51;
+						var e2 = `52;
+						{
+							hscript.Expr.EIf(f(c), f(e1), if (e2 != null) {
+								f(e2);
+							} else {
+								null;
+							});
+						};
+					};
+				};
+				case 10: {
+					var `9 = `[0];
+					var `10 = `[1];
+					{
+						var c = `9;
+						var e = `10;
+						{
+							hscript.Expr.EWhile(f(c), f(e));
+						};
+					};
+				};
+				case 11: {
+					var `36 = `[0];
+					var `37 = `[1];
+					var `38 = `[2];
+					{
+						var v = `36;
+						var it = `37;
+						var e = `38;
+						{
+							hscript.Expr.EFor(v, f(it), f(e));
+						};
+					};
+				};
+				case 12, 13: {
+					{
+						hscript.Tools.expr(e);
+					};
+				};
+				case 14: {
+					var `23 = `[0];
+					var `24 = `[1];
+					var `25 = `[2];
+					var `26 = `[3];
+					{
+						var args = `23;
+						var e = `24;
+						var name = `25;
+						var t = `26;
+						{
+							hscript.Expr.EFunction(args, f(e), name, t);
+						};
+					};
+				};
+				case 15: {
+					var `1 = `[0];
+					{
+						var e = `1;
+						{
+							hscript.Expr.EReturn(if (e != null) {
+								f(e);
+							} else {
+								null;
+							});
+						};
+					};
+				};
+				case 16: {
+					var `53 = `[0];
+					var `54 = `[1];
+					{
+						var e = `53;
+						var i = `54;
+						{
+							hscript.Expr.EArray(f(e), f(i));
+						};
+					};
+				};
+				case 17: {
+					var `31 = `[0];
+					{
+						var el = `31;
+						{
+							hscript.Expr.EArrayDecl({
+								var ` = [];
+								{
+									var `1 = 0;
+									while (`1 < el.length) {
+										var e = el[`1];
+										++ `1;
+										`.push(f(e));
+									};
+								};
+								`;
+							});
+						};
+					};
+				};
+				case 18: {
+					var `4 = `[0];
+					var `5 = `[1];
+					{
+						var cl = `4;
+						var el = `5;
+						{
+							hscript.Expr.ENew(cl, {
+								var ` = [];
+								{
+									var `1 = 0;
+									while (`1 < el.length) {
+										var e = el[`1];
+										++ `1;
+										`.push(f(e));
+									};
+								};
+								`;
+							});
+						};
+					};
+				};
+				case 19: {
+					var `11 = `[0];
+					{
+						var e = `11;
+						{
+							hscript.Expr.EThrow(f(e));
+						};
+					};
+				};
+				case 20: {
+					var `32 = `[0];
+					var `33 = `[1];
+					var `34 = `[2];
+					var `35 = `[3];
+					{
+						var e = `32;
+						var v = `33;
+						var t = `34;
+						var c = `35;
+						{
+							hscript.Expr.ETry(f(e), v, t, f(c));
+						};
+					};
+				};
+				case 21: {
+					var `2 = `[0];
+					{
+						var fl = `2;
+						{
+							hscript.Expr.EObject({
+								var ` = [];
+								{
+									var `1 = 0;
+									while (`1 < fl.length) {
+										var fi = fl[`1];
+										++ `1;
+										`.push({name : fi.name, e : f(fi.e)});
+									};
+								};
+								`;
+							});
+						};
+					};
+				};
+				case 22: {
+					var `18 = `[0];
+					var `19 = `[1];
+					var `20 = `[2];
+					{
+						var c = `18;
+						var e1 = `19;
+						var e2 = `20;
+						{
+							hscript.Expr.ETernary(f(c), f(e1), f(e2));
+						};
+					};
+				};
+				case 23: {
+					var `15 = `[0];
+					var `16 = `[1];
+					var `17 = `[2];
+					{
+						var e = `15;
+						var cases = `16;
+						var def = `17;
+						{
+							hscript.Expr.ESwitch(f(e), {
+								var ` = [];
+								{
+									var `1 = 0;
+									while (`1 < cases.length) {
+										var c = cases[`1];
+										++ `1;
+										`.push({values : {
+											var `1 = [];
+											{
+												var `2 = 0;
+												var `3 = c.values;
+												while (`2 < `3.length) {
+													var v = `3[`2];
+													++ `2;
+													`1.push(f(v));
+												};
+											};
+											`1;
+										}, expr : f(c.expr)});
+									};
+								};
+								`;
+							}, if (def == null) {
+								null;
+							} else {
+								f(def);
+							});
+						};
+					};
+				};
+				case 24: {
+					var `42 = `[0];
+					var `43 = `[1];
+					{
+						var c = `42;
+						var e = `43;
+						{
+							hscript.Expr.EDoWhile(f(c), f(e));
+						};
+					};
+				};
+				case 25: {
+					var `44 = `[0];
+					var `45 = `[1];
+					var `46 = `[2];
+					{
+						var name = `44;
+						var args = `45;
+						var e = `46;
+						{
+							hscript.Expr.EMeta(name, if (args == null) {
+								null;
+							} else {
+								{
+									var ` = [];
+									{
+										var `1 = 0;
+										while (`1 < args.length) {
+											var a = args[`1];
+											++ `1;
+											`.push(f(a));
+										};
+									};
+									`;
+								};
+							}, f(e));
+						};
+					};
+				};
+				case 26: {
+					var `6 = `[0];
+					var `7 = `[1];
+					{
+						var e = `6;
+						var t = `7;
+						{
+							hscript.Expr.ECheckType(f(e), t);
+						};
+					};
+				};
+			};
+		};
+		return hscript.Tools.mk(edef, e);
+	}
+
+	public static inline function expr(e:hscript.Expr) {
+		return e;
+	}
+
+	public static inline function mk(e:hscript.ExprDef, p:hscript.Expr) {
+		return e;
+	}
+}

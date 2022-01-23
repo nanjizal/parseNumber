@@ -1,0 +1,12 @@
+@:nullSafety @:noDoc @:dox(hide)
+class hx.doctest.internal.DocTestAssertion {
+
+	public function new(file:hx.doctest.internal.SourceFile, expression:String, lineNumber:Int, charStart:Int, charEnd:Int) {
+		this.expression = expression;
+		this.pos = {fileName : file.filePath, lineNumber : lineNumber, className : "", methodName : "", charStart : cast charStart, charEnd : cast charEnd};
+	}
+
+	public var expression(default,ctor):String;
+
+	public var pos(default,ctor):hx.doctest.PosInfosExt;
+}

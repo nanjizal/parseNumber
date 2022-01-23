@@ -152,10 +152,10 @@ js_Boot.__string_rec = function(o,s) {
 		return String(o);
 	}
 };
-function parseNumber_Main_main() {
-	haxe_Log.trace("Testing parseValues",{ fileName : "src/parseNumber/Main.hx", lineNumber : 5, className : "parseNumber._Main.Main_Fields_", methodName : "main"});
+function parseNumber_MainParseNumber_main() {
+	haxe_Log.trace("Testing parseValues",{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 7, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
 	new htmlHelper_tools_DivertTrace();
-	var testValues = ["-100.000","test","0xFF0000","  01","  2.2  ","1.2.3","800-83b9"];
+	var testValues = ["-100.000","test","0xFF0000","  01","  2.2  ","1.2.3","800-83b9","1_00_1","1,2_3","0xFFffFFffF"];
 	var out = [];
 	var _g = [];
 	var _g1 = 0;
@@ -167,29 +167,31 @@ function parseNumber_Main_main() {
 	}
 	var parseValues = _g;
 	var _g = 0;
-	while(_g < parseValues.length) {
-		var value = parseValues[_g];
-		++_g;
-		haxe_Log.trace(value,{ fileName : "src/parseNumber/Main.hx", lineNumber : 17, className : "parseNumber._Main.Main_Fields_", methodName : "main"});
-	}
-	var _g = 0;
 	while(_g < testValues.length) {
 		var value = testValues[_g];
 		++_g;
-		haxe_Log.trace("testing \"" + value + "\"",{ fileName : "src/parseNumber/Main.hx", lineNumber : 21, className : "parseNumber._Main.Main_Fields_", methodName : "main"});
+		haxe_Log.trace("testing \"" + value + "\"",{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 28, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
 		parseNumber_ParseNumber_parseTest(value);
 	}
+	haxe_Log.trace("test Scientific",{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 32, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
+	haxe_Log.trace("123e5 = " + parseNumber_ParseNumber_parse("123e5",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 33, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
+	haxe_Log.trace("123e-5 = " + parseNumber_ParseNumber_parse("123e-5",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 34, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
+	haxe_Log.trace("123e-5 e = " + parseNumber_ParseNumber_parse("123e-5 e",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 35, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
 }
 function parseNumber_ParseNumber_parseTest(no) {
 	haxe_Log.trace("result '" + parseNumber_ParseNumber_parse(no) + "'",{ fileName : "src/parseNumber/ParseNumber.hx", lineNumber : 28, className : "parseNumber._ParseNumber.ParseNumber_Fields_", methodName : "parseTest"});
 }
-function parseNumber_ParseNumber_parse(no) {
+function parseNumber_ParseNumber_parse(no,allowScientific) {
+	if(allowScientific == null) {
+		allowScientific = false;
+	}
 	var str = new parseNumber_StringCodeIterator(no);
 	var temp = "";
 	var count = 0;
 	var isNumber = true;
 	var dotCount = 0;
 	var hasX = false;
+	var isScientific = false;
 	str.c = str.str.charCodeAt(str.pos++);
 	_hx_loop1: while(str.pos < str.length + 1) {
 		if(count == 0) {
@@ -229,6 +231,10 @@ function parseNumber_ParseNumber_parse(no) {
 				}
 			}
 		}
+		if(str.c == 95 || str.c == 44) {
+			str.c = str.str.charCodeAt(str.pos++);
+			continue;
+		}
 		switch(str.c) {
 		case 32:
 			while(str.pos < str.length + 1) {
@@ -239,10 +245,19 @@ function parseNumber_ParseNumber_parse(no) {
 				str.c = str.str.charCodeAt(str.pos++);
 			}
 			break _hx_loop1;
-		case 46:
-			if(dotCount == 0 && !hasX) {
+		case 45:
+			if(isScientific == true) {
 				var c2 = str.c;
 				str.b.b += String.fromCodePoint(c2);
+			} else {
+				isNumber = false;
+				break _hx_loop1;
+			}
+			break;
+		case 46:
+			if(dotCount == 0 && !hasX) {
+				var c3 = str.c;
+				str.b.b += String.fromCodePoint(c3);
 			} else {
 				isNumber = false;
 				break _hx_loop1;
@@ -250,17 +265,67 @@ function parseNumber_ParseNumber_parse(no) {
 			++dotCount;
 			break;
 		case 48:case 49:case 50:case 51:case 52:case 53:case 54:case 55:case 56:case 57:
-			var c3 = str.c;
-			str.b.b += String.fromCodePoint(c3);
+			var c4 = str.c;
+			str.b.b += String.fromCodePoint(c4);
 			break;
 		case 65:case 66:case 67:case 68:case 69:case 70:case 97:case 98:case 99:case 100:case 101:case 102:
 			if(hasX) {
-				if(count < 11) {
-					var c4 = str.c;
-					str.b.b += String.fromCodePoint(c4);
-				} else {
+				if(count < "0xFFffFFf".length) {
 					var c5 = str.c;
 					str.b.b += String.fromCodePoint(c5);
+				} else {
+					isNumber = false;
+					break _hx_loop1;
+				}
+			} else if(allowScientific) {
+				if(str.c == 101 || str.c == 69) {
+					var letters = str.str;
+					var someNumerics = false;
+					var curPos = str.pos;
+					var _g = str.pos;
+					var _g1 = letters.length;
+					_hx_loop3: while(_g < _g1) {
+						var i = _g++;
+						var no = letters.charCodeAt(i);
+						curPos = i;
+						switch(no) {
+						case 45:
+							if(i != str.pos) {
+								isNumber = false;
+								break _hx_loop3;
+							}
+							break;
+						case 48:case 49:case 50:case 51:case 52:case 53:case 54:case 55:case 56:case 57:
+							someNumerics = true;
+							break;
+						default:
+							break _hx_loop3;
+						}
+					}
+					if(someNumerics == false) {
+						isNumber = false;
+					}
+					if(isNumber == false) {
+						break _hx_loop1;
+					}
+					var _g2 = curPos;
+					var _g3 = letters.length;
+					while(_g2 < _g3) {
+						var i1 = _g2++;
+						if(i1 != 32) {
+							break;
+						}
+					}
+					if(isNumber == false) {
+						break _hx_loop1;
+					} else {
+						isScientific = true;
+						var c6 = str.c;
+						str.b.b += String.fromCodePoint(c6);
+					}
+				} else {
+					isNumber = false;
+					break _hx_loop1;
 				}
 			} else {
 				isNumber = false;
@@ -303,5 +368,5 @@ if( String.fromCodePoint == null ) String.fromCodePoint = function(c) { return c
 String.__name__ = true;
 Array.__name__ = true;
 js_Boot.__toStr = ({ }).toString;
-parseNumber_Main_main();
+parseNumber_MainParseNumber_main();
 })(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
