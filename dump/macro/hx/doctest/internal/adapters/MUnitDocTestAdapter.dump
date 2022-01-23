@@ -1,0 +1,25 @@
+@:nullSafety @:noDoc @:dox(hide)
+class hx.doctest.internal.adapters.MUnitDocTestAdapter extends hx.doctest.internal.adapters.DocTestAdapter {
+
+	public inline function new() {}
+
+	public function getFrameworkName() {
+		return "massive.munit";
+	}
+
+	@:has_untyped
+	public function generateTestFail(assertion:hx.doctest.internal.DocTestAssertion, errorMsg:String) {
+		return cast {expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.ECall({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("massive")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 676, 683)}, "munit"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 676, 689)}, "Assert"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 676, 696)}, "fail"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 676, 701)}, [haxe.macro.Context.makeExpr("" + assertion.expression + " --> " + errorMsg, $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 704, 745)), {expr : haxe.macro.ExprDef.ECast(haxe.macro.Context.makeExpr(assertion.pos, $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 754, 769)), null), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 747, 769)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 676, 770)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 665, 779)};
+	}
+
+	@:has_untyped
+	public function generateTestSuccess(assertion:hx.doctest.internal.DocTestAssertion) {
+		return cast {expr : haxe.macro.ExprDef.EBlock([{expr : haxe.macro.ExprDef.ECall({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EField({expr : haxe.macro.ExprDef.EConst(haxe.macro.Constant.CIdent("mconsole")), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 904, 912)}, "Console"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 904, 920)}, "info"), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 904, 925)}, [haxe.macro.Context.makeExpr("\n" + assertion.pos.fileName + ":" + assertion.pos.lineNumber + " [OK] " + assertion.expression, $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 928, 1016))]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 904, 1017)}]), pos : $__mk_pos__("/usr/local/lib/haxeLibrary/haxe-doctest/git/src/hx/doctest/internal/adapters/MUnitDocTestAdapter.hx", 893, 1026)};
+	}
+
+	public function generateTestMethod(methodName:String, descr:String, assertions:Array<haxe.macro.Expr>) {
+		var field = super.generateTestMethod(methodName, descr, assertions);
+		field.meta.push({name : "Test", pos : haxe.macro.Context.currentPos()});
+		return field;
+	}
+}

@@ -26,7 +26,7 @@ function main(){
     */
     for( value in testValues ){
         trace( 'testing "' + value +'"');
-        parseTest( value ); 
+        parseTest( value, true, true, true ); 
     }
     
     trace( 'test Scientific' );

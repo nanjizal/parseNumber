@@ -1731,7 +1731,7 @@ js_Lib.getNextHaxeUID = function() {
 };
 var parseNumber_ParseNumber = {};
 parseNumber_ParseNumber._new = function(v) {
-	var this1 = parseNumber_ParseNumber_parse(v);
+	var this1 = parseNumber_ParseNumber_parse(v,true,true,true);
 	return this1;
 };
 parseNumber_ParseNumber.isValid = function(this1) {
@@ -1757,7 +1757,16 @@ parseNumber_ParseNumber.fromArray = function(arr) {
 	}
 	return _g;
 };
-function parseNumber_ParseNumber_parseTest(no) {
+function parseNumber_ParseNumber_parseTest(no,allowComma,allowUnderscore,allowScientific) {
+	if(allowScientific == null) {
+		allowScientific = false;
+	}
+	if(allowUnderscore == null) {
+		allowUnderscore = false;
+	}
+	if(allowComma == null) {
+		allowComma = false;
+	}
 	haxe_Log.trace("result '" + parseNumber_ParseNumber_parse(no) + "'",{ fileName : "src/parseNumber/ParseNumber.hx", lineNumber : 28, className : "parseNumber._ParseNumber.ParseNumber_Fields_", methodName : "parseTest"});
 }
 function parseNumber_ParseNumber_parseFloat(no) {
@@ -1766,9 +1775,15 @@ function parseNumber_ParseNumber_parseFloat(no) {
 function parseNumber_ParseNumber_parseInt(no) {
 	Std.parseFloat(no);
 }
-function parseNumber_ParseNumber_parse(no,allowScientific) {
+function parseNumber_ParseNumber_parse(no,allowComma,allowUnderscore,allowScientific) {
 	if(allowScientific == null) {
 		allowScientific = false;
+	}
+	if(allowUnderscore == null) {
+		allowUnderscore = false;
+	}
+	if(allowComma == null) {
+		allowComma = false;
 	}
 	var str = new parseNumber_StringCodeIterator(no);
 	var temp = "";
@@ -1802,7 +1817,11 @@ function parseNumber_ParseNumber_parse(no,allowScientific) {
 				str.b = new StringBuf();
 			}
 		}
-		if(str.c == 95 || str.c == 44) {
+		if(str.c == 95 && allowUnderscore) {
+			str.next();
+			continue;
+		}
+		if(str.c == 44 && allowComma) {
 			str.next();
 			continue;
 		}
@@ -2035,8 +2054,8 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 		}
 		var left;
 		try {
-			haxe_Log.trace("stripping out underscores and commas  \"1,2_3\" = " + parseNumber_ParseNumber_parse("1,2_3"),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
-			var no = parseNumber_ParseNumber_parse("1,2_3");
+			haxe_Log.trace("stripping out underscores and commas needs allowComma, allowUnderscore \"1,2_3\" = " + parseNumber_ParseNumber_parse("1,2_3",true,true),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
+			var no = parseNumber_ParseNumber_parse("1,2_3",true,true);
 			left = no == "123";
 		} catch( _g ) {
 			haxe_NativeStackTrace.saveStack(_g);
@@ -2052,9 +2071,9 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 			right = "exception: " + Std.string(ex) + hx_doctest_internal_DocTestUtils.exceptionStackAsString();
 		}
 		if(hx_doctest_internal_DocTestUtils.deepEquals(left,right)) {
-			utest_Assert.pass("src/parseNumber/ParseNumber.hx:69 [OK] ({\ntrace( 'stripping out underscores and commas  \"1,2_3\" = ' + parse('1,2_3'));\nvar no: String = parse('1,2_3');\nno == '123'; }) == true",{ lineNumber : 69, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.pass("src/parseNumber/ParseNumber.hx:69 [OK] ({\ntrace( 'stripping out underscores and commas needs allowComma, allowUnderscore \"1,2_3\" = ' + parse('1,2_3', true, true ));\nvar no: String = parse('1,2_3',true, true);\nno == '123'; }) == true",{ lineNumber : 69, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		} else {
-			utest_Assert.fail("({\ntrace( 'stripping out underscores and commas  \"1,2_3\" = ' + parse('1,2_3'));\nvar no: String = parse('1,2_3');\nno == '123'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 69, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.fail("({\ntrace( 'stripping out underscores and commas needs allowComma, allowUnderscore \"1,2_3\" = ' + parse('1,2_3', true, true ));\nvar no: String = parse('1,2_3',true, true);\nno == '123'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 69, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		}
 		var left;
 		try {
@@ -2081,7 +2100,7 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 		}
 		var left;
 		try {
-			haxe_Log.trace("not accepting hex numbers above ARGB \"0xffFFffFFf\" = " + parseNumber_ParseNumber_parse("0xffFFffFFf"),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
+			haxe_Log.trace("not accepting hex numbers above ARGB \"0xffFFffFFf\" = " + parseNumber_ParseNumber_parse("0xffFFffFFf",false,false,true),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
 			var no = parseNumber_ParseNumber_parse("0xffFFffFFf");
 			left = no == "NaN";
 		} catch( _g ) {
@@ -2098,14 +2117,14 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 			right = "exception: " + Std.string(ex) + hx_doctest_internal_DocTestUtils.exceptionStackAsString();
 		}
 		if(hx_doctest_internal_DocTestUtils.deepEquals(left,right)) {
-			utest_Assert.pass("src/parseNumber/ParseNumber.hx:83 [OK] ({\ntrace( 'not accepting hex numbers above ARGB \"0xffFFffFFf\" = ' + parse('0xffFFffFFf'));\nvar no: String = parse('0xffFFffFFf');\nno == 'NaN'; }) == true",{ lineNumber : 83, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.pass("src/parseNumber/ParseNumber.hx:83 [OK] ({\ntrace( 'not accepting hex numbers above ARGB \"0xffFFffFFf\" = ' + parse('0xffFFffFFf', false, false, true ));\nvar no: String = parse('0xffFFffFFf');\nno == 'NaN'; }) == true",{ lineNumber : 83, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		} else {
-			utest_Assert.fail("({\ntrace( 'not accepting hex numbers above ARGB \"0xffFFffFFf\" = ' + parse('0xffFFffFFf'));\nvar no: String = parse('0xffFFffFFf');\nno == 'NaN'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 83, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.fail("({\ntrace( 'not accepting hex numbers above ARGB \"0xffFFffFFf\" = ' + parse('0xffFFffFFf', false, false, true ));\nvar no: String = parse('0xffFFffFFf');\nno == 'NaN'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 83, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		}
 		var left;
 		try {
-			haxe_Log.trace("testing scientific, need to set allowScientific \"123e5\" = " + parseNumber_ParseNumber_parse("123e5",true),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
-			var no = parseNumber_ParseNumber_parse("123e5",true);
+			haxe_Log.trace("testing scientific, need to set allowScientific \"123e5\" = " + parseNumber_ParseNumber_parse("123e5",false,false,true),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
+			var no = parseNumber_ParseNumber_parse("123e5",false,false,true);
 			left = no == "123e5";
 		} catch( _g ) {
 			haxe_NativeStackTrace.saveStack(_g);
@@ -2121,14 +2140,14 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 			right = "exception: " + Std.string(ex) + hx_doctest_internal_DocTestUtils.exceptionStackAsString();
 		}
 		if(hx_doctest_internal_DocTestUtils.deepEquals(left,right)) {
-			utest_Assert.pass("src/parseNumber/ParseNumber.hx:90 [OK] ({\ntrace( 'testing scientific, need to set allowScientific \"123e5\" = ' + parse('123e5', true));\nvar no: String = parse('123e5', true);\nno == '123e5'; }) == true",{ lineNumber : 90, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.pass("src/parseNumber/ParseNumber.hx:90 [OK] ({\ntrace( 'testing scientific, need to set allowScientific \"123e5\" = ' + parse('123e5', false, false,true));\nvar no: String = parse('123e5', false, false, true);\nno == '123e5'; }) == true",{ lineNumber : 90, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		} else {
-			utest_Assert.fail("({\ntrace( 'testing scientific, need to set allowScientific \"123e5\" = ' + parse('123e5', true));\nvar no: String = parse('123e5', true);\nno == '123e5'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 90, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.fail("({\ntrace( 'testing scientific, need to set allowScientific \"123e5\" = ' + parse('123e5', false, false,true));\nvar no: String = parse('123e5', false, false, true);\nno == '123e5'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 90, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		}
 		var left;
 		try {
-			haxe_Log.trace("testing scientific, need to set allowScientific \"123e-5 \" = " + parseNumber_ParseNumber_parse("123e-5 ",true),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
-			var no = parseNumber_ParseNumber_parse("123e-5 ",true);
+			haxe_Log.trace("testing scientific, need to set allowScientific \"123e-5 \" = " + parseNumber_ParseNumber_parse("123e-5 ",false,false,true),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
+			var no = parseNumber_ParseNumber_parse("123e-5 ",false,false,true);
 			left = no == "123e-5";
 		} catch( _g ) {
 			haxe_NativeStackTrace.saveStack(_g);
@@ -2144,14 +2163,14 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 			right = "exception: " + Std.string(ex) + hx_doctest_internal_DocTestUtils.exceptionStackAsString();
 		}
 		if(hx_doctest_internal_DocTestUtils.deepEquals(left,right)) {
-			utest_Assert.pass("src/parseNumber/ParseNumber.hx:97 [OK] ({\ntrace( 'testing scientific, need to set allowScientific \"123e-5 \" = ' + parse('123e-5 ',true));\nvar no: String = parse('123e-5 ', true);\nno == '123e-5'; }) == true",{ lineNumber : 97, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.pass("src/parseNumber/ParseNumber.hx:97 [OK] ({\ntrace( 'testing scientific, need to set allowScientific \"123e-5 \" = ' + parse('123e-5 ',false, false, true));\nvar no: String = parse('123e-5 ', false, false, true);\nno == '123e-5'; }) == true",{ lineNumber : 97, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		} else {
-			utest_Assert.fail("({\ntrace( 'testing scientific, need to set allowScientific \"123e-5 \" = ' + parse('123e-5 ',true));\nvar no: String = parse('123e-5 ', true);\nno == '123e-5'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 97, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.fail("({\ntrace( 'testing scientific, need to set allowScientific \"123e-5 \" = ' + parse('123e-5 ',false, false, true));\nvar no: String = parse('123e-5 ', false, false, true);\nno == '123e-5'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 97, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		}
 		var left;
 		try {
 			haxe_Log.trace("testing scientific, need to set allowScientific \"123e-5 e\" = " + parseNumber_ParseNumber_parse("123e-5 e",true),{ fileName : "src/parseNumber/ParseTest.hx", lineNumber : 11, className : "parseNumber.ParseTest", methodName : "testParseNumber_1"});
-			var no = parseNumber_ParseNumber_parse("123e-5 e",true);
+			var no = parseNumber_ParseNumber_parse("123e-5 e",false,false,true);
 			left = no == "NaN";
 		} catch( _g ) {
 			haxe_NativeStackTrace.saveStack(_g);
@@ -2167,9 +2186,9 @@ parseNumber_ParseTest.prototype = $extend(utest_Test.prototype,{
 			right = "exception: " + Std.string(ex) + hx_doctest_internal_DocTestUtils.exceptionStackAsString();
 		}
 		if(hx_doctest_internal_DocTestUtils.deepEquals(left,right)) {
-			utest_Assert.pass("src/parseNumber/ParseNumber.hx:105 [OK] ({\ntrace( 'testing scientific, need to set allowScientific \"123e-5 e\" = ' + parse('123e-5 e',true));\nvar no: String = parse('123e-5 e', true);\nno == 'NaN'; }) == true",{ lineNumber : 105, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.pass("src/parseNumber/ParseNumber.hx:105 [OK] ({\ntrace( 'testing scientific, need to set allowScientific \"123e-5 e\" = ' + parse('123e-5 e',true));\nvar no: String = parse('123e-5 e', false, false, true);\nno == 'NaN'; }) == true",{ lineNumber : 105, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		} else {
-			utest_Assert.fail("({\ntrace( 'testing scientific, need to set allowScientific \"123e-5 e\" = ' + parse('123e-5 e',true));\nvar no: String = parse('123e-5 e', true);\nno == 'NaN'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 105, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
+			utest_Assert.fail("({\ntrace( 'testing scientific, need to set allowScientific \"123e-5 e\" = ' + parse('123e-5 e',true));\nvar no: String = parse('123e-5 e', false, false, true);\nno == 'NaN'; }) == true --> Left side `$left` does not equal `$right`.",{ lineNumber : 105, fileName : "src/parseNumber/ParseNumber.hx", charStart : 10, className : "", charEnd : 14, methodName : ""});
 		}
 	}
 	,__initializeUtest__: function() {

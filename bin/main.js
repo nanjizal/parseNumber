@@ -162,7 +162,7 @@ function parseNumber_MainParseNumber_main() {
 	var _g2 = testValues.length;
 	while(_g1 < _g2) {
 		var i = _g1++;
-		var this1 = parseNumber_ParseNumber_parse(testValues[i]);
+		var this1 = parseNumber_ParseNumber_parse(testValues[i],true,true,true);
 		_g.push(this1);
 	}
 	var parseValues = _g;
@@ -171,19 +171,34 @@ function parseNumber_MainParseNumber_main() {
 		var value = testValues[_g];
 		++_g;
 		haxe_Log.trace("testing \"" + value + "\"",{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 28, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
-		parseNumber_ParseNumber_parseTest(value);
+		parseNumber_ParseNumber_parseTest(value,true,true,true);
 	}
 	haxe_Log.trace("test Scientific",{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 32, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
 	haxe_Log.trace("123e5 = " + parseNumber_ParseNumber_parse("123e5",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 33, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
 	haxe_Log.trace("123e-5 = " + parseNumber_ParseNumber_parse("123e-5",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 34, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
 	haxe_Log.trace("123e-5 e = " + parseNumber_ParseNumber_parse("123e-5 e",true),{ fileName : "src/parseNumber/MainParseNumber.hx", lineNumber : 35, className : "parseNumber._MainParseNumber.MainParseNumber_Fields_", methodName : "main"});
 }
-function parseNumber_ParseNumber_parseTest(no) {
-	haxe_Log.trace("result '" + parseNumber_ParseNumber_parse(no) + "'",{ fileName : "src/parseNumber/ParseNumber.hx", lineNumber : 28, className : "parseNumber._ParseNumber.ParseNumber_Fields_", methodName : "parseTest"});
-}
-function parseNumber_ParseNumber_parse(no,allowScientific) {
+function parseNumber_ParseNumber_parseTest(no,allowComma,allowUnderscore,allowScientific) {
 	if(allowScientific == null) {
 		allowScientific = false;
+	}
+	if(allowUnderscore == null) {
+		allowUnderscore = false;
+	}
+	if(allowComma == null) {
+		allowComma = false;
+	}
+	haxe_Log.trace("result '" + parseNumber_ParseNumber_parse(no) + "'",{ fileName : "src/parseNumber/ParseNumber.hx", lineNumber : 28, className : "parseNumber._ParseNumber.ParseNumber_Fields_", methodName : "parseTest"});
+}
+function parseNumber_ParseNumber_parse(no,allowComma,allowUnderscore,allowScientific) {
+	if(allowScientific == null) {
+		allowScientific = false;
+	}
+	if(allowUnderscore == null) {
+		allowUnderscore = false;
+	}
+	if(allowComma == null) {
+		allowComma = false;
 	}
 	var str = new parseNumber_StringCodeIterator(no);
 	var temp = "";
@@ -231,7 +246,11 @@ function parseNumber_ParseNumber_parse(no,allowScientific) {
 				}
 			}
 		}
-		if(str.c == 95 || str.c == 44) {
+		if(str.c == 95 && allowUnderscore) {
+			str.c = str.str.charCodeAt(str.pos++);
+			continue;
+		}
+		if(str.c == 44 && allowComma) {
 			str.c = str.str.charCodeAt(str.pos++);
 			continue;
 		}

@@ -1,0 +1,2 @@
+@:forward @:transitive
+abstract js.lib.Thenable<T> from js.lib.ThenableStruct<js.lib.Thenable.T> {}

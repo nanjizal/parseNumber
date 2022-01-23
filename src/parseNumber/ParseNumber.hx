@@ -2,7 +2,7 @@ package parseNumber;
 
 abstract ParseNumber( String ) to String {
     public inline function new( v: String ){
-        this = parse( v );
+        this = parse( v, true, true, true );
     }
     public inline function isValid(): Bool {
         return !(this == 'NaN');
@@ -24,7 +24,7 @@ abstract ParseNumber( String ) to String {
     }
 }
 
-function parseTest( no: String ){
+function parseTest( no: String, allowComma = false, allowUnderscore = false, allowScientific = false ){
     trace( "result '" + parse( no ) + "'" );
 }
 
@@ -67,8 +67,8 @@ function parseInt( no: String ){
      * 
      * <pre><code>
      * >>> ({ 
-     * ... trace( 'stripping out underscores and commas  "1,2_3" = ' + parse('1,2_3'));
-     * ... var no: String = parse('1,2_3');
+     * ... trace( 'stripping out underscores and commas needs allowComma, allowUnderscore "1,2_3" = ' + parse('1,2_3', true, true ));
+     * ... var no: String = parse('1,2_3',true, true);
      * ... no == '123'; }) == true
      * </code></pre>
      * 
@@ -81,22 +81,22 @@ function parseInt( no: String ){
      * 
      * <pre><code>
      * >>> ({ 
-     * ... trace( 'not accepting hex numbers above ARGB "0xffFFffFFf" = ' + parse('0xffFFffFFf'));
+     * ... trace( 'not accepting hex numbers above ARGB "0xffFFffFFf" = ' + parse('0xffFFffFFf', false, false, true ));
      * ... var no: String = parse('0xffFFffFFf');
      * ... no == 'NaN'; }) == true
      * </code></pre>
      * 
      * <pre><code>
      * >>> ({ 
-     * ... trace( 'testing scientific, need to set allowScientific "123e5" = ' + parse('123e5', true));
-     * ... var no: String = parse('123e5', true);
+     * ... trace( 'testing scientific, need to set allowScientific "123e5" = ' + parse('123e5', false, false,true));
+     * ... var no: String = parse('123e5', false, false, true);
      * ... no == '123e5'; }) == true
      * </code></pre>
      * 
      * <pre><code>
      * >>> ({ 
-     * ... trace( 'testing scientific, need to set allowScientific "123e-5 " = ' + parse('123e-5 ',true));
-     * ... var no: String = parse('123e-5 ', true);
+     * ... trace( 'testing scientific, need to set allowScientific "123e-5 " = ' + parse('123e-5 ',false, false, true));
+     * ... var no: String = parse('123e-5 ', false, false, true);
      * ... no == '123e-5'; }) == true
      * </code></pre>
      *
@@ -104,11 +104,11 @@ function parseInt( no: String ){
      * <pre><code>
      * >>> ({ 
      * ... trace( 'testing scientific, need to set allowScientific "123e-5 e" = ' + parse('123e-5 e',true));
-     * ... var no: String = parse('123e-5 e', true);
+     * ... var no: String = parse('123e-5 e', false, false, true);
      * ... no == 'NaN'; }) == true
      * </code></pre>
      */
-function parse( no: String, allowScientific = false ){
+function parse( no: String, allowComma = false, allowUnderscore = false, allowScientific = false ){
     var str = new StringCodeIterator( no );
     var temp: String = '';
     var count = 0;
@@ -149,7 +149,11 @@ function parse( no: String, allowScientific = false ){
                 }
             }
         }
-        if( str.c == '_'.code || str.c == ','.code ){
+        if( str.c == '_'.code && allowUnderscore ){
+            str.next();
+            continue;
+        }
+        if( str.c == ','.code && allowComma ){
             str.next();
             continue;
         }

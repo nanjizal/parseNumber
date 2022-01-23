@@ -1,0 +1,1 @@
+typedef hx.doctest.DocTestGeneratorConfig = { ?srcFolder : Null<String>, ?srcFilePathPattern : Null<String>, ?docTestNextLineIdentifier : Null<String>, ?docTestLineIdentifier : Null<String> }

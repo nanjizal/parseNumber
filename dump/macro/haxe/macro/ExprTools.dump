@@ -1,0 +1,1297 @@
+class haxe.macro.ExprTools {
+
+	public static function toString(e:haxe.macro.Expr) return new haxe.macro.Printer(null).printExpr(e)
+
+	public static function iter(e:haxe.macro.Expr, f:haxe.macro.Expr -> Void) {
+		@:ast(switch (e.expr) {
+	case EConst(_), EContinue, EBreak, EDisplayNew(_):
+	case EField(e, _), EParenthesis(e), EUntyped(e), EThrow(e), EDisplay(e, _), ECheckType(e, _), EUnop(_, _, e), ECast(e, _), EIs(e, _) | EMeta(_, e):
+		f(e);	
+	case EArray(e1, e2), EWhile(e1, e2, _), EBinop(_, e1, e2), EFor(e1, e2):
+		f(e1);
+		f(e2);	
+	case EVars(vl):
+		for (v  in  vl) opt2(v.expr, f);	
+	case ETry(e, cl):
+		f(e);
+		for (c  in  cl) f(c.expr);	
+	case ETernary(e1, e2, e3) | EIf(e1, e2, e3):
+		f(e1);
+		f(e2);
+		opt2(e3, f);	
+	case EArrayDecl(el), ENew(_, el), EBlock(el):
+		ExprArrayTools.iter(el, f);	
+	case EObjectDecl(fl):
+		for (fd  in  fl) f(fd.expr);	
+	case ECall(e, el):
+		f(e);
+		ExprArrayTools.iter(el, f);	
+	case EReturn(e):
+		opt2(e, f);	
+	case EFunction(_, func):
+		for (arg  in  func.args) opt2(arg.value, f);
+		opt2(func.expr, f);	
+	case ESwitch(e, cl, edef):
+		f(e);
+		for (c  in  cl) {
+			ExprArrayTools.iter(c.values, f);
+			opt2(c.guard, f);
+			opt2(c.expr, f);
+		};
+		if (edef != null && edef.expr != null) f(edef);	
+}) {
+			var ` = e.expr;
+			switch (@:exhaustive enumIndex `) {
+				case 0: {
+					var `29 = `[0];
+					{};
+				};
+				case 1: {
+					var `23 = `[0];
+					var `24 = `[1];
+					{
+						var e1 = `23;
+						var e2 = `24;
+						{
+							f(e1);
+							f(e2);
+						};
+					};
+				};
+				case 2: {
+					var `10 = `[0];
+					var `11 = `[1];
+					var `12 = `[2];
+					{
+						var e1 = `11;
+						var e2 = `12;
+						{
+							f(e1);
+							f(e2);
+						};
+					};
+				};
+				case 3: {
+					var `35 = `[0];
+					var `36 = `[1];
+					{
+						var e = `35;
+						{
+							f(e);
+						};
+					};
+				};
+				case 4: {
+					var `20 = `[0];
+					{
+						var e = `20;
+						{
+							f(e);
+						};
+					};
+				};
+				case 5: {
+					var `13 = `[0];
+					{
+						var fl = `13;
+						{
+							{
+								var ` = 0;
+								while (` < fl.length) {
+									var fd = fl[`];
+									++ `;
+									f(fd.expr);
+								};
+							};
+						};
+					};
+				};
+				case 6: {
+					var `25 = `[0];
+					{
+						var el = `25;
+						{
+							haxe.macro.ExprArrayTools.iter(el, f);
+						};
+					};
+				};
+				case 7: {
+					var `31 = `[0];
+					var `32 = `[1];
+					{
+						var e = `31;
+						var el = `32;
+						{
+							f(e);
+							haxe.macro.ExprArrayTools.iter(el, f);
+						};
+					};
+				};
+				case 8: {
+					var `51 = `[0];
+					var `52 = `[1];
+					{
+						var el = `52;
+						{
+							haxe.macro.ExprArrayTools.iter(el, f);
+						};
+					};
+				};
+				case 9: {
+					var `42 = `[0];
+					var `43 = `[1];
+					var `44 = `[2];
+					{
+						var e = `44;
+						{
+							f(e);
+						};
+					};
+				};
+				case 10: {
+					var `50 = `[0];
+					{
+						var vl = `50;
+						{
+							{
+								var ` = 0;
+								while (` < vl.length) {
+									var v = vl[`];
+									++ `;
+									haxe.macro.ExprTools.opt2(v.expr, f);
+								};
+							};
+						};
+					};
+				};
+				case 11: {
+					var `33 = `[0];
+					var `34 = `[1];
+					{
+						var func = `34;
+						{
+							{
+								var ` = 0;
+								var `1 = func.args;
+								while (` < `1.length) {
+									var arg = `1[`];
+									++ `;
+									haxe.macro.ExprTools.opt2(arg.value, f);
+								};
+							};
+							haxe.macro.ExprTools.opt2(func.expr, f);
+						};
+					};
+				};
+				case 12: {
+					var `9 = `[0];
+					{
+						var el = `9;
+						{
+							haxe.macro.ExprArrayTools.iter(el, f);
+						};
+					};
+				};
+				case 13: {
+					var `4 = `[0];
+					var `5 = `[1];
+					{
+						var e1 = `4;
+						var e2 = `5;
+						{
+							f(e1);
+							f(e2);
+						};
+					};
+				};
+				case 14: {
+					var `6 = `[0];
+					var `7 = `[1];
+					var `8 = `[2];
+					{
+						var e1 = `6;
+						var e2 = `7;
+						var e3 = `8;
+						{
+							f(e1);
+							f(e2);
+							haxe.macro.ExprTools.opt2(e3, f);
+						};
+					};
+				};
+				case 15: {
+					var `17 = `[0];
+					var `18 = `[1];
+					var `19 = `[2];
+					{
+						var e1 = `17;
+						var e2 = `18;
+						{
+							f(e1);
+							f(e2);
+						};
+					};
+				};
+				case 16: {
+					var `14 = `[0];
+					var `15 = `[1];
+					var `16 = `[2];
+					{
+						var e = `14;
+						var cl = `15;
+						var edef = `16;
+						{
+							f(e);
+							{
+								var ` = 0;
+								while (` < cl.length) {
+									var c = cl[`];
+									++ `;
+									haxe.macro.ExprArrayTools.iter(c.values, f);
+									haxe.macro.ExprTools.opt2(c.guard, f);
+									haxe.macro.ExprTools.opt2(c.expr, f);
+								};
+							};
+							if (edef != null && edef.expr != null) {
+								f(edef);
+							};
+						};
+					};
+				};
+				case 17: {
+					var `39 = `[0];
+					var `40 = `[1];
+					{
+						var e = `39;
+						var cl = `40;
+						{
+							f(e);
+							{
+								var ` = 0;
+								while (` < cl.length) {
+									var c = cl[`];
+									++ `;
+									f(c.expr);
+								};
+							};
+						};
+					};
+				};
+				case 18: {
+					var `41 = `[0];
+					{
+						var e = `41;
+						{
+							haxe.macro.ExprTools.opt2(e, f);
+						};
+					};
+				};
+				case 19, 20: {
+					{};
+				};
+				case 21: {
+					var `1 = `[0];
+					{
+						var e = `1;
+						{
+							f(e);
+						};
+					};
+				};
+				case 22: {
+					var `26 = `[0];
+					{
+						var e = `26;
+						{
+							f(e);
+						};
+					};
+				};
+				case 23: {
+					var `45 = `[0];
+					var `46 = `[1];
+					{
+						var e = `45;
+						{
+							f(e);
+						};
+					};
+				};
+				case 24: {
+					var `27 = `[0];
+					var `28 = `[1];
+					{
+						var e = `27;
+						{
+							f(e);
+						};
+					};
+				};
+				case 25: {
+					var `30 = `[0];
+					{};
+				};
+				case 26: {
+					var `47 = `[0];
+					var `48 = `[1];
+					var `49 = `[2];
+					{
+						var e1 = `47;
+						var e2 = `48;
+						var e3 = `49;
+						{
+							f(e1);
+							f(e2);
+							haxe.macro.ExprTools.opt2(e3, f);
+						};
+					};
+				};
+				case 27: {
+					var `37 = `[0];
+					var `38 = `[1];
+					{
+						var e = `37;
+						{
+							f(e);
+						};
+					};
+				};
+				case 28: {
+					var `21 = `[0];
+					var `22 = `[1];
+					{
+						var e = `22;
+						{
+							f(e);
+						};
+					};
+				};
+				case 29: {
+					var `2 = `[0];
+					var `3 = `[1];
+					{
+						var e = `2;
+						{
+							f(e);
+						};
+					};
+				};
+			};
+		};
+	}
+
+	public static function map(e:haxe.macro.Expr, f:haxe.macro.Expr -> haxe.macro.Expr) {
+		return {pos : e.pos, expr : @:ast(switch (e.expr) {
+	case EConst(_):
+		e.expr;	
+	case EArray(e1, e2):
+		EArray(f(e1), f(e2));	
+	case EBinop(op, e1, e2):
+		EBinop(op, f(e1), f(e2));	
+	case EField(e, field):
+		EField(f(e), field);	
+	case EParenthesis(e):
+		EParenthesis(f(e));	
+	case EObjectDecl(fields):
+		var ret = [];
+		for (field  in  fields) ret.push({ field : field.field, expr : f(field.expr), quotes : field.quotes });
+		EObjectDecl(ret);	
+	case EArrayDecl(el):
+		EArrayDecl(ExprArrayTools.map(el, f));	
+	case ECall(e, params):
+		ECall(f(e), ExprArrayTools.map(params, f));	
+	case ENew(tp, params):
+		ENew(tp, ExprArrayTools.map(params, f));	
+	case EUnop(op, postFix, e):
+		EUnop(op, postFix, f(e));	
+	case EVars(vars):
+		var ret = [];
+		for (v  in  vars) {
+			var v2:Var = { name : v.name, type : v.type, expr : opt(v.expr, f) };
+			if (v.isFinal != null) v2.isFinal = v.isFinal;
+			ret.push(v2);
+		};
+		EVars(ret);	
+	case EBlock(el):
+		EBlock(ExprArrayTools.map(el, f));	
+	case EFor(it, expr):
+		EFor(f(it), f(expr));	
+	case EIf(econd, eif, eelse):
+		EIf(f(econd), f(eif), opt(eelse, f));	
+	case EWhile(econd, e, normalWhile):
+		EWhile(f(econd), f(e), normalWhile);	
+	case EReturn(e):
+		EReturn(opt(e, f));	
+	case EUntyped(e):
+		EUntyped(f(e));	
+	case EThrow(e):
+		EThrow(f(e));	
+	case ECast(e, t):
+		ECast(f(e), t);	
+	case EIs(e, t):
+		EIs(f(e), t);	
+	case EDisplay(e, dk):
+		EDisplay(f(e), dk);	
+	case ETernary(econd, eif, eelse):
+		ETernary(f(econd), f(eif), f(eelse));	
+	case ECheckType(e, t):
+		ECheckType(f(e), t);	
+	case EDisplayNew(_), EContinue, EBreak:
+		e.expr;	
+	case ETry(e, catches):
+		var ret = [];
+		for (c  in  catches) ret.push({ name : c.name, type : c.type, expr : f(c.expr) });
+		ETry(f(e), ret);	
+	case ESwitch(e, cases, edef):
+		var ret = [];
+		for (c  in  cases) ret.push({ expr : opt(c.expr, f), guard : opt(c.guard, f), values : ExprArrayTools.map(c.values, f) });
+		ESwitch(f(e), ret, edef == null || edef.expr == null ? edef : f(edef));	
+	case EFunction(kind, func):
+		var ret = [];
+		for (arg  in  func.args) ret.push({ name : arg.name, opt : arg.opt, type : arg.type, value : opt(arg.value, f) });
+		EFunction(kind, { args : ret, ret : func.ret, params : func.params, expr : f(func.expr) });	
+	case EMeta(m, e):
+		EMeta(m, f(e));	
+}) {
+			var ` = e.expr;
+			switch (@:exhaustive enumIndex `) {
+				case 0: {
+					var `29 = `[0];
+					{
+						e.expr;
+					};
+				};
+				case 1: {
+					var `20 = `[0];
+					var `21 = `[1];
+					{
+						var e1 = `20;
+						var e2 = `21;
+						{
+							haxe.macro.ExprDef.EArray(f(e1), f(e2));
+						};
+					};
+				};
+				case 2: {
+					var `10 = `[0];
+					var `11 = `[1];
+					var `12 = `[2];
+					{
+						var op = `10;
+						var e1 = `11;
+						var e2 = `12;
+						{
+							haxe.macro.ExprDef.EBinop(op, f(e1), f(e2));
+						};
+					};
+				};
+				case 3: {
+					var `35 = `[0];
+					var `36 = `[1];
+					{
+						var e = `35;
+						var field = `36;
+						{
+							haxe.macro.ExprDef.EField(f(e), field);
+						};
+					};
+				};
+				case 4: {
+					var `22 = `[0];
+					{
+						var e = `22;
+						{
+							haxe.macro.ExprDef.EParenthesis(f(e));
+						};
+					};
+				};
+				case 5: {
+					var `13 = `[0];
+					{
+						var fields = `13;
+						{
+							var ret = [];
+							{
+								var ` = 0;
+								while (` < fields.length) {
+									var field = fields[`];
+									++ `;
+									ret.push({field : field.field, expr : f(field.expr), quotes : field.quotes});
+								};
+							};
+							haxe.macro.ExprDef.EObjectDecl(ret);
+						};
+					};
+				};
+				case 6: {
+					var `23 = `[0];
+					{
+						var el = `23;
+						{
+							haxe.macro.ExprDef.EArrayDecl(haxe.macro.ExprArrayTools.map(el, f));
+						};
+					};
+				};
+				case 7: {
+					var `30 = `[0];
+					var `31 = `[1];
+					{
+						var e = `30;
+						var params = `31;
+						{
+							haxe.macro.ExprDef.ECall(f(e), haxe.macro.ExprArrayTools.map(params, f));
+						};
+					};
+				};
+				case 8: {
+					var `50 = `[0];
+					var `51 = `[1];
+					{
+						var tp = `50;
+						var params = `51;
+						{
+							haxe.macro.ExprDef.ENew(tp, haxe.macro.ExprArrayTools.map(params, f));
+						};
+					};
+				};
+				case 9: {
+					var `42 = `[0];
+					var `43 = `[1];
+					var `44 = `[2];
+					{
+						var op = `42;
+						var postFix = `43;
+						var e = `44;
+						{
+							haxe.macro.ExprDef.EUnop(op, postFix, f(e));
+						};
+					};
+				};
+				case 10: {
+					var `52 = `[0];
+					{
+						var vars = `52;
+						{
+							var ret = [];
+							{
+								var ` = 0;
+								while (` < vars.length) {
+									var v = vars[`];
+									++ `;
+									var v2 = {name : v.name, type : v.type, expr : haxe.macro.ExprTools.opt(v.expr, f)};
+									if (v.isFinal != null) {
+										v2.isFinal = v.isFinal;
+									};
+									ret.push(v2);
+								};
+							};
+							haxe.macro.ExprDef.EVars(ret);
+						};
+					};
+				};
+				case 11: {
+					var `33 = `[0];
+					var `34 = `[1];
+					{
+						var kind = `33;
+						var func = `34;
+						{
+							var ret = [];
+							{
+								var ` = 0;
+								var `1 = func.args;
+								while (` < `1.length) {
+									var arg = `1[`];
+									++ `;
+									ret.push({name : arg.name, opt : arg.opt, type : arg.type, value : haxe.macro.ExprTools.opt(arg.value, f)});
+								};
+							};
+							haxe.macro.ExprDef.EFunction(kind, {args : cast ret, ret : func.ret, params : func.params, expr : f(func.expr)});
+						};
+					};
+				};
+				case 12: {
+					var `1 = `[0];
+					{
+						var el = `1;
+						{
+							haxe.macro.ExprDef.EBlock(haxe.macro.ExprArrayTools.map(el, f));
+						};
+					};
+				};
+				case 13: {
+					var `2 = `[0];
+					var `3 = `[1];
+					{
+						var it = `2;
+						var expr = `3;
+						{
+							haxe.macro.ExprDef.EFor(f(it), f(expr));
+						};
+					};
+				};
+				case 14: {
+					var `4 = `[0];
+					var `5 = `[1];
+					var `6 = `[2];
+					{
+						var econd = `4;
+						var eif = `5;
+						var eelse = `6;
+						{
+							haxe.macro.ExprDef.EIf(f(econd), f(eif), haxe.macro.ExprTools.opt(eelse, f));
+						};
+					};
+				};
+				case 15: {
+					var `17 = `[0];
+					var `18 = `[1];
+					var `19 = `[2];
+					{
+						var econd = `17;
+						var e = `18;
+						var normalWhile = `19;
+						{
+							haxe.macro.ExprDef.EWhile(f(econd), f(e), normalWhile);
+						};
+					};
+				};
+				case 16: {
+					var `14 = `[0];
+					var `15 = `[1];
+					var `16 = `[2];
+					{
+						var e = `14;
+						var cases = `15;
+						var edef = `16;
+						{
+							var ret = [];
+							{
+								var ` = 0;
+								while (` < cases.length) {
+									var c = cases[`];
+									++ `;
+									ret.push({expr : haxe.macro.ExprTools.opt(c.expr, f), guard : haxe.macro.ExprTools.opt(c.guard, f), values : haxe.macro.ExprArrayTools.map(c.values, f)});
+								};
+							};
+							haxe.macro.ExprDef.ESwitch(f(e), ret, if (edef == null || edef.expr == null) {
+								edef;
+							} else {
+								f(edef);
+							});
+						};
+					};
+				};
+				case 17: {
+					var `40 = `[0];
+					var `41 = `[1];
+					{
+						var e = `40;
+						var catches = `41;
+						{
+							var ret = [];
+							{
+								var ` = 0;
+								while (` < catches.length) {
+									var c = catches[`];
+									++ `;
+									ret.push({name : c.name, type : c.type, expr : f(c.expr)});
+								};
+							};
+							haxe.macro.ExprDef.ETry(f(e), ret);
+						};
+					};
+				};
+				case 18: {
+					var `37 = `[0];
+					{
+						var e = `37;
+						{
+							haxe.macro.ExprDef.EReturn(haxe.macro.ExprTools.opt(e, f));
+						};
+					};
+				};
+				case 19, 20: {
+					{
+						e.expr;
+					};
+				};
+				case 21: {
+					var `7 = `[0];
+					{
+						var e = `7;
+						{
+							haxe.macro.ExprDef.EUntyped(f(e));
+						};
+					};
+				};
+				case 22: {
+					var `26 = `[0];
+					{
+						var e = `26;
+						{
+							haxe.macro.ExprDef.EThrow(f(e));
+						};
+					};
+				};
+				case 23: {
+					var `45 = `[0];
+					var `46 = `[1];
+					{
+						var e = `45;
+						var t = `46;
+						{
+							haxe.macro.ExprDef.ECast(f(e), t);
+						};
+					};
+				};
+				case 24: {
+					var `27 = `[0];
+					var `28 = `[1];
+					{
+						var e = `27;
+						var dk = `28;
+						{
+							haxe.macro.ExprDef.EDisplay(f(e), dk);
+						};
+					};
+				};
+				case 25: {
+					var `32 = `[0];
+					{
+						e.expr;
+					};
+				};
+				case 26: {
+					var `47 = `[0];
+					var `48 = `[1];
+					var `49 = `[2];
+					{
+						var econd = `47;
+						var eif = `48;
+						var eelse = `49;
+						{
+							haxe.macro.ExprDef.ETernary(f(econd), f(eif), f(eelse));
+						};
+					};
+				};
+				case 27: {
+					var `38 = `[0];
+					var `39 = `[1];
+					{
+						var e = `38;
+						var t = `39;
+						{
+							haxe.macro.ExprDef.ECheckType(f(e), t);
+						};
+					};
+				};
+				case 28: {
+					var `24 = `[0];
+					var `25 = `[1];
+					{
+						var m = `24;
+						var e = `25;
+						{
+							haxe.macro.ExprDef.EMeta(m, f(e));
+						};
+					};
+				};
+				case 29: {
+					var `8 = `[0];
+					var `9 = `[1];
+					{
+						var e = `8;
+						var t = `9;
+						{
+							haxe.macro.ExprDef.EIs(f(e), t);
+						};
+					};
+				};
+			};
+		}};
+	}
+
+	public static function getValue(e:haxe.macro.Expr) {
+		return @:ast(switch (e.expr) {
+	case EConst(CInt(v)):
+		Std.parseInt(v);	
+	case EConst(CFloat(v)):
+		Std.parseFloat(v);	
+	case EConst(CString(s)):
+		s;	
+	case EConst(CIdent("true")):
+		true;	
+	case EConst(CIdent("false")):
+		false;	
+	case EConst(CIdent("null")):
+		null;	
+	case EParenthesis(e1) | EUntyped(e1) | EMeta(_, e1):
+		getValue(e1);	
+	case EObjectDecl(fields):
+		var obj = { };
+		for (field  in  fields) {
+			Reflect.setField(obj, field.field, getValue(field.expr));
+		};
+		obj;	
+	case EArrayDecl(el):
+		el.map(getValue);	
+	case EIf(econd, eif, eelse) | ETernary(econd, eif, eelse):
+		if (eelse == null) {
+			throw "If statements only have a value if the else clause is defined";
+		} else {
+			var econd:Dynamic = getValue(econd);
+			econd ? getValue(eif) : getValue(eelse);
+		};	
+	case EUnop(op, false, e1):
+		var e1:Dynamic = getValue(e1);
+		switch (op) {
+			case OpNot:
+				!e1;			
+			case OpNeg:
+				-e1;			
+			case OpNegBits:
+				~e1;			
+			case _:
+				throw "Unsupported expression: $e";			
+		};	
+	case EBinop(op, e1, e2):
+		var e1:Dynamic = getValue(e1);
+		var e2:Dynamic = getValue(e2);
+		switch (op) {
+			case OpAdd:
+				e1 + e2;			
+			case OpSub:
+				e1 - e2;			
+			case OpMult:
+				e1 * e2;			
+			case OpDiv:
+				e1 / e2;			
+			case OpMod:
+				e1 % e2;			
+			case OpEq:
+				e1 == e2;			
+			case OpNotEq:
+				e1 != e2;			
+			case OpLt:
+				e1 < e2;			
+			case OpLte:
+				e1 <= e2;			
+			case OpGt:
+				e1 > e2;			
+			case OpGte:
+				e1 >= e2;			
+			case OpOr:
+				e1 | e2;			
+			case OpAnd:
+				e1 & e2;			
+			case OpXor:
+				e1 ^ e2;			
+			case OpBoolAnd:
+				e1 && e2;			
+			case OpBoolOr:
+				e1 || e2;			
+			case OpShl:
+				e1 << e2;			
+			case OpShr:
+				e1 >> e2;			
+			case OpUShr:
+				e1 >>> e2;			
+			case _:
+				throw "Unsupported expression: $e";			
+		};	
+	case _:
+		throw "Unsupported expression: $e";	
+}) {
+			var ` = e.expr;
+			switch (enumIndex `) {
+				case 0: {
+					var `13 = `[0];
+					switch (enumIndex `13) {
+						case 0: {
+							var `15 = `13[0];
+							{
+								var v = `15;
+								{
+									Std.parseInt(v);
+								};
+							};
+						};
+						case 1: {
+							var `14 = `13[0];
+							{
+								var v = `14;
+								{
+									Std.parseFloat(v);
+								};
+							};
+						};
+						case 2: {
+							var `16 = `13[0];
+							var `17 = `13[1];
+							{
+								var s = `16;
+								{
+									s;
+								};
+							};
+						};
+						case 3: {
+							var `18 = `13[0];
+							switch (`18) {
+								case "false": {
+									{
+										false;
+									};
+								};
+								case "null": {
+									{
+										null;
+									};
+								};
+								case "true": {
+									{
+										true;
+									};
+								};
+								default: {
+									throw throw haxe.Exception.thrown("Unsupported expression: " + Std.string(e));
+								}
+							};
+						};
+						default: {
+							throw throw haxe.Exception.thrown("Unsupported expression: " + Std.string(e));
+						}
+					};
+				};
+				case 2: {
+					var `6 = `[0];
+					var `7 = `[1];
+					var `8 = `[2];
+					{
+						var op = `6;
+						var e1 = `7;
+						var e2 = `8;
+						{
+							var e1 = haxe.macro.ExprTools.getValue(e1);
+							var e2 = haxe.macro.ExprTools.getValue(e2);
+							@:ast(switch (op) {
+	case OpAdd:
+		e1 + e2;	
+	case OpSub:
+		e1 - e2;	
+	case OpMult:
+		e1 * e2;	
+	case OpDiv:
+		e1 / e2;	
+	case OpMod:
+		e1 % e2;	
+	case OpEq:
+		e1 == e2;	
+	case OpNotEq:
+		e1 != e2;	
+	case OpLt:
+		e1 < e2;	
+	case OpLte:
+		e1 <= e2;	
+	case OpGt:
+		e1 > e2;	
+	case OpGte:
+		e1 >= e2;	
+	case OpOr:
+		e1 | e2;	
+	case OpAnd:
+		e1 & e2;	
+	case OpXor:
+		e1 ^ e2;	
+	case OpBoolAnd:
+		e1 && e2;	
+	case OpBoolOr:
+		e1 || e2;	
+	case OpShl:
+		e1 << e2;	
+	case OpShr:
+		e1 >> e2;	
+	case OpUShr:
+		e1 >>> e2;	
+	case _:
+		throw "Unsupported expression: $e";	
+}) switch (enumIndex op) {
+								case 0: {
+									{
+										e1 + e2;
+									};
+								};
+								case 1: {
+									{
+										e1 * e2;
+									};
+								};
+								case 2: {
+									{
+										e1 / e2;
+									};
+								};
+								case 3: {
+									{
+										e1 - e2;
+									};
+								};
+								case 5: {
+									{
+										e1 == e2;
+									};
+								};
+								case 6: {
+									{
+										e1 != e2;
+									};
+								};
+								case 7: {
+									{
+										e1 > e2;
+									};
+								};
+								case 8: {
+									{
+										e1 >= e2;
+									};
+								};
+								case 9: {
+									{
+										e1 < e2;
+									};
+								};
+								case 10: {
+									{
+										e1 <= e2;
+									};
+								};
+								case 11: {
+									{
+										e1 & e2;
+									};
+								};
+								case 12: {
+									{
+										e1 | e2;
+									};
+								};
+								case 13: {
+									{
+										e1 ^ e2;
+									};
+								};
+								case 14: {
+									{
+										e1 && e2;
+									};
+								};
+								case 15: {
+									{
+										e1 || e2;
+									};
+								};
+								case 16: {
+									{
+										e1 << e2;
+									};
+								};
+								case 17: {
+									{
+										e1 >> e2;
+									};
+								};
+								case 18: {
+									{
+										e1 >>> e2;
+									};
+								};
+								case 19: {
+									{
+										e1 % e2;
+									};
+								};
+								default: {
+									throw throw haxe.Exception.thrown("Unsupported expression: " + Std.string(e));
+								}
+							};
+						};
+					};
+				};
+				case 4: {
+					var `9 = `[0];
+					{
+						var e1 = `9;
+						{
+							haxe.macro.ExprTools.getValue(e1);
+						};
+					};
+				};
+				case 5: {
+					var `5 = `[0];
+					{
+						var fields = `5;
+						{
+							var obj = {};
+							{
+								var ` = 0;
+								while (` < fields.length) {
+									var field = fields[`];
+									++ `;
+									Reflect.setField(obj, field.field, haxe.macro.ExprTools.getValue(field.expr));
+								};
+							};
+							obj;
+						};
+					};
+				};
+				case 6: {
+					var `12 = `[0];
+					{
+						var el = `12;
+						{
+							{
+								var f = haxe.macro.ExprTools.getValue;
+								{
+									var ` = [];
+									{
+										var `1 = 0;
+										var `2 = el;
+										while (`1 < `2.length) {
+											var v = `2[`1];
+											++ `1;
+											`.push(f(v));
+										};
+									};
+									`;
+								};
+							};
+						};
+					};
+				};
+				case 9: {
+					var `22 = `[0];
+					var `23 = `[1];
+					var `24 = `[2];
+					if (`23 == false) {
+						{
+							var op = `22;
+							var e1 = `24;
+							{
+								var e1 = haxe.macro.ExprTools.getValue(e1);
+								@:ast(switch (op) {
+	case OpNot:
+		!e1;	
+	case OpNeg:
+		-e1;	
+	case OpNegBits:
+		~e1;	
+	case _:
+		throw "Unsupported expression: $e";	
+}) switch (enumIndex op) {
+									case 2: {
+										{
+											! e1;
+										};
+									};
+									case 3: {
+										{
+											- e1;
+										};
+									};
+									case 4: {
+										{
+											~ e1;
+										};
+									};
+									default: {
+										throw throw haxe.Exception.thrown("Unsupported expression: " + Std.string(e));
+									}
+								};
+							};
+						};
+					} else {
+						throw throw haxe.Exception.thrown("Unsupported expression: " + Std.string(e));
+					};
+				};
+				case 14: {
+					var `2 = `[0];
+					var `3 = `[1];
+					var `4 = `[2];
+					{
+						var econd = `2;
+						var eif = `3;
+						var eelse = `4;
+						{
+							if (eelse == null) {
+								throw throw haxe.Exception.thrown("If statements only have a value if the else clause is defined");
+							} else {
+								var econd = haxe.macro.ExprTools.getValue(econd);
+								if (econd) {
+									haxe.macro.ExprTools.getValue(eif);
+								} else {
+									haxe.macro.ExprTools.getValue(eelse);
+								};
+							};
+						};
+					};
+				};
+				case 21: {
+					var `1 = `[0];
+					{
+						var e1 = `1;
+						{
+							haxe.macro.ExprTools.getValue(e1);
+						};
+					};
+				};
+				case 26: {
+					var `19 = `[0];
+					var `20 = `[1];
+					var `21 = `[2];
+					{
+						var econd = `19;
+						var eif = `20;
+						var eelse = `21;
+						{
+							if (eelse == null) {
+								throw throw haxe.Exception.thrown("If statements only have a value if the else clause is defined");
+							} else {
+								var econd = haxe.macro.ExprTools.getValue(econd);
+								if (econd) {
+									haxe.macro.ExprTools.getValue(eif);
+								} else {
+									haxe.macro.ExprTools.getValue(eelse);
+								};
+							};
+						};
+					};
+				};
+				case 28: {
+					var `10 = `[0];
+					var `11 = `[1];
+					{
+						var e1 = `11;
+						{
+							haxe.macro.ExprTools.getValue(e1);
+						};
+					};
+				};
+				default: {
+					throw throw haxe.Exception.thrown("Unsupported expression: " + Std.string(e));
+				}
+			};
+		};
+	}
+
+	static inline function opt(e:Null<haxe.macro.Expr>, f:haxe.macro.Expr -> haxe.macro.Expr) return if (e == null) {
+		null;
+	} else {
+		f(e);
+	}
+
+	static inline function opt2(e:Null<haxe.macro.Expr>, f:haxe.macro.Expr -> Void) if (e != null) {
+		f(e);
+	}
+}
