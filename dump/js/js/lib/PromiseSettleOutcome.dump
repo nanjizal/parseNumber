@@ -1,1 +1,0 @@
-typedef js.lib.PromiseSettleOutcome = { ?value : Null<Dynamic>, status : js.lib.PromiseSettleStatus, ?reason : Null<Dynamic> }
