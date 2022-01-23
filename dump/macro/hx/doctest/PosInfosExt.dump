@@ -1,1 +1,0 @@
-typedef hx.doctest.PosInfosExt = { methodName : String, lineNumber : Int, fileName : String, ?customParams : Null<Array<Dynamic>>, className : String, ?charStart : Null<Int>, ?charEnd : Null<Int> }
