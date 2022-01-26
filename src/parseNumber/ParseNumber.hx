@@ -35,7 +35,6 @@ function parseFloat( no: String ){
 function parseInt( no: String ){
     Std.parseFloat( no );
 }
-// scientific exponent notation not setup/available.
     /**
      * <pre><code>
      * >>> ({ 
